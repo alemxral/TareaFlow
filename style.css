@@ -130,9 +130,9 @@ button {
    LEFT BAR & CONTENT
 ===================================================== */
 .left-bar {
-  width: 230px; /* Default */
+  width: 220px; /* Default */
   min-width: 160px;
-  max-width: 200px;
+  max-width: 190px;
   transition: width 0.3s ease-in-out;
   
 }
@@ -185,12 +185,13 @@ button {
    RIGHT BAR & CONTENT
 ===================================================== */
 .right-bar {
-  width: 280px;
+  width: 220px;
   border-left: 1px solid #e3e7f7;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
+  flex-wrap: wrap;
   margin-left: auto;
+  overflow-x: auto;
 }
 .right-bar .header {
   font-size: 20px;
