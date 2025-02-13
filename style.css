@@ -1,0 +1,745 @@
+/* ======================================================
+   GLOBAL SETTINGS & VARIABLES
+===================================================== */
+* {
+  box-sizing: border-box;
+  outline: none;
+}
+
+:root {
+  --bg-color: #f5f8ff;
+  --main-color: #353536;
+  --secondary-color: #8e92a4;
+  --main-text-color: #5d606b;
+  --secondary-dark-color: #9496a5;
+  --tag-color-one: #e0fbf6;
+  --tag-color-text-one: #58c2a9;
+  --tag-color-two: #ece7fe;
+  --tag-color-text-two: #8972f3;
+  --tag-color-three: #fde7ea;
+  --tag-color-text-three: #e77f89;
+  --tag-color-four: #f7f8fc;
+  --tag-color-text-four: #a0a6b5;
+  --checkbox-color: #009e90;
+  --button-color: #49beb7;
+  --box-color: #fff1d6;
+  --box-color-2: #d3e6ff;
+  --box-color-3: #ffd9d9;
+  --box-color-4: #daffe5;
+  --task-color: #777982;
+  --grey: #f9f9f9;
+  --primary-color: #185ee0;
+  --secondary-color: #e6eef9;
+  --bg-nav: rgba(255, 255, 255, 0.05);
+}
+
+/* Shared Display Properties */
+body,
+.item,
+.top-part,
+.top-part .count {
+  display: flex;
+  align-items: center;
+}
+
+/* ======================================================
+   BODY & GLOBAL LAYOUT
+===================================================== */
+
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body */
+body {
+  font-family: "Inter", sans-serif;
+  background-color: var(--tab-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* ======================================================
+   TASK MANAGER CONTAINER
+===================================================== */
+.task-manager {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow:
+    0 0.3px 2.2px rgba(0, 0, 0, 0.011),
+    0 0.7px 5.3px rgba(0, 0, 0, 0.016),
+    0 1.3px 10px rgba(0, 0, 0, 0.02),
+    0 2.2px 17.9px rgba(0, 0, 0, 0.024),
+    0 4.2px 33.4px rgba(0, 0, 0, 0.029),
+    0 10px 80px rgba(0, 0, 0, 0.04);
+  overflow: visible;
+}
+
+/* ======================================================
+   ADD TASK BUTTON & WRAPPER
+===================================================== */
+.add-task-btn {
+  background-color: var(--checkbox-color);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out;
+}
+.add-task-btn:hover {
+  background-color: #007a73;
+}
+.add-task-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* ======================================================
+   LEFT BAR & CONTENT
+===================================================== */
+.left-bar {
+  background-color: var(--bg-color);
+  width: 230px;
+  border-right: 1px solid #e3e7f7;
+  position: relative;
+}
+
+.left-content {
+  padding: 40px;
+}
+
+.item {
+  color: var(--main-color);
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+.item svg {
+  width: 14px;
+  height: 14px;
+  margin-right: 10px;
+  color: currentColor;
+}
+
+.category-list {
+  margin-top: 50px;
+}
+.category-list .item {
+  color: var(--secondary-color);
+}
+
+.actions {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.circle {
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background-color: #fe4d46;
+  box-shadow: 14px 0 0 0 #fbc023, 28px 0 0 0 #7dd21f;
+}
+.circle-2 {
+  border-radius: 50%;
+  width: 4px;
+  height: 4px;
+  background-color: #d5d7e3;
+  box-shadow: -6px 0 0 0 #d5d7e3, 6px 0 0 0 #d5d7e3;
+}
+
+/* ======================================================
+   RIGHT BAR & CONTENT
+===================================================== */
+.right-bar {
+  width: 320px;
+  border-left: 1px solid #e3e7f7;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.right-bar .header {
+  font-size: 20px;
+  color: var(--main-text-color);
+  margin-left: 30px;
+}
+.top-part {
+  padding: 30px;
+  align-self: flex-end;
+}
+.top-part svg {
+  width: 14px;
+  height: 14px;
+  margin-right: 14px;
+  color: var(--main-color);
+}
+.top-part .count {
+  font-size: 12px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  background-color: #623ce8;
+  color: #fff;
+  justify-content: center;
+}
+.right-content {
+  padding: 10px 40px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ======================================================
+   PAGE CONTENT & CATEGORY TABS
+===================================================== */
+.page-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 40px 20px 0 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.page-content .header {
+  font-size: 26px;
+  color: var(--main-color);
+  margin: 10px 0 5px;
+  padding-bottom: 10px;
+}
+.content-categories {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 5px;
+  width: 100%;
+  padding: 10px 0;
+  padding-right: 20px;
+  flex-wrap: wrap;
+}
+
+/* ------------------- Task Tabs Navigation ------------------- */
+
+/* ======================================================
+   tabs
+===================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+/* Root Variables */
+:root {
+  --primary-color: #009e90;
+  --secondary-color: #e6eef9;
+  --text-color: #5d606b;
+  --tab-bg: #f5f8ff;
+  --tab-hover: rgba(0, 158, 144, 0.15);
+}
+
+/* Category Tabs Navigation */
+.category-tabs {
+  position: relative;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 5px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1),
+              0 2px 2px rgba(0, 0, 0, 0.1),
+              0 4px 4px rgba(0, 0, 0, 0.1);
+  width: fit-content;
+}
+
+/* Category Tabs List */
+.category-tabs ul {
+  list-style: none;
+  display: flex;
+  gap: 8px;
+  padding: 0;
+  position: relative;
+}
+
+/* Category Items */
+.category-tabs li {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-color);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+}
+
+/* Hover Effect */
+.category-tabs li:hover {
+  background-color: var(--tab-hover);
+}
+
+/* Active Category */
+.category-tabs li.active {
+  color: white;
+  font-weight: 600;
+  background-color: var(--checkbox-color);
+}
+
+/* Active Indicator */
+.active-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background-color: var(--primary-color);
+  border-radius: 15px;
+  transition: all 0.3s ease-in-out;
+  z-index: -1;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 700px) {
+  .category-tabs ul {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .category-tabs li {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+  }
+}
+
+
+
+/* ======================================================
+   TASKS, TASK ITEMS & TAGS
+===================================================== */
+.tasks-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 15px 20px;
+  overflow-y: visible;
+}
+.task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 8px;
+  border-bottom: 1px solid #eee;
+  color: var(--task-color);
+  font-size: 13px;
+  font-weight: 500;
+}
+.task:last-child {
+  border-bottom: none;
+}
+.task label {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  cursor: pointer;
+}
+.label-text {
+  display: inline-block;
+  margin-top: 3px;
+  margin-left: 10px;
+  position: relative;
+}
+label .label-text:before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  transition: 0.2s ease;
+}
+.task-item:checked + label .label-text:before {
+  background-color: var(--checkbox-color);
+  border: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 10px;
+  background-position: center;
+  border: 1px solid var(--checkbox-color);
+}
+
+/* ======================================================
+   TAGS & TAG WRAPPER
+===================================================== */
+.tag {
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 20px;
+}
+.tag.approved {
+  background-color: var(--tag-color-one);
+  color: var(--tag-color-text-one);
+}
+.tag.progress {
+  background-color: var(--tag-color-three);
+  color: var(--tag-color-text-three);
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 20px;
+  width: 80px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tag.review {
+  background-color: var(--tag-color-three);
+  color: var(--tag-color-text-three);
+}
+.tag.waiting {
+  background-color: var(--tag-color-four);
+  color: var(--tag-color-text-four);
+}
+.tag.progress-wrapper {
+  display: flex;
+  gap: 10px;
+  flex-grow: 1;
+  justify-content: flex-end;
+  /* Removed redundant left margin values */
+}
+
+/* ======================================================
+   COLUMNS HEADER FOR TASKS
+===================================================== */
+.columns-header {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-grow: 1;
+}
+.tasks-description {
+  background-color: var(--grey);
+  color: black;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 20px;
+  width: 80px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ======================================================
+   COLLAPSIBLE HEADERS & CONTENT
+===================================================== */
+.collapsible-header {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #ddd;
+  margin: 0;
+  font-size: 20px;
+  color: var(--main-color);
+}
+.collapsed .collapse-icon {
+  transform: rotate(-90deg);
+}
+.collapsible-content {
+  display: block;
+  transition: max-height 0.3s ease-in-out;
+  max-height: 500px;
+}
+.collapsible-content.collapsed {
+  max-height: 0;
+  display: none;
+}
+.collapse-icon {
+  font-size: 20px;
+  transition: transform 0.3s ease, font-size 0.3s ease;
+}
+.collapse-icon.rotated {
+  transform: rotate(180deg);
+}
+
+/* ======================================================
+   CATEGORY EDIT & ADD BUTTONS
+===================================================== */
+.edit-icon {
+  display: none;
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--secondary-color);
+}
+.label-wrapper:hover .edit-icon {
+  display: inline-block;
+  visibility: visible;
+}
+.add-category-btn {
+  background-color: var(--checkbox-color);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out;
+}
+.add-category-btn:hover {
+  background-color: #007a73;
+}
+/* Container for Category Titles (Pills) */
+.columns-header {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 5px 16px;
+  padding-right: 0;
+}
+
+/* ======================================================
+   LOGO / TITLE STYLING
+===================================================== */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 10px;
+  text-align: center;
+  background: var(--grey);
+  border-bottom: 2px solid #e3e7f7;
+}
+.logo-text {
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--main-text-color);
+  letter-spacing: 2px;
+  margin: 0;
+}
+.logo-text span {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #f0f0f0;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+
+/* ======================================================
+   MODAL STYLES (Merged Duplicate Definitions)
+===================================================== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.close-btn {
+  float: right;
+  font-size: 22px;
+  cursor: pointer;
+}
+.close-btn:hover {
+  color: red;
+}
+.modal-input,
+.modal-textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.modal-textarea {
+  height: 80px;
+}
+.save-task-btn,
+.save-note-btn,
+.save-category-btn {
+  margin-top: 10px;
+  background-color: var(--checkbox-color);
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.save-task-btn:hover,
+.save-note-btn:hover,
+.save-category-btn:hover {
+  background-color: #007a73;
+}
+
+/* ======================================================
+   ADD NOTE BUTTON & NOTE STYLING
+===================================================== */
+.note-button-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+}
+.add-note-btn {
+  background-color: var(--checkbox-color);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.add-note-btn:hover {
+  background-color: #007a73;
+}
+
+.delete-note-btn {
+  background-color: var(--checkbox-color);
+  color: #fff;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 6px;
+  font-weight: 250;
+  transition: background-color 0.2s ease-in-out;
+}
+
+
+.delete-note-btn:hover {
+  background-color: #007a73;
+}
+.task-box {
+  position: relative;
+  border-radius: 12px;
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  background-color: var(--box-color);
+  box-shadow: 2px 2px 4px rgba(235,235,235,1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.task-box .description-task {
+  display: flex;
+  flex-direction: column;
+}
+.task-box .task-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+.task-box .time {
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+.task-box .delete-note-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.task-box:hover .delete-note-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+
+/* ======================================================
+   RESPONSIVE STYLES
+===================================================== */
+@media screen and (max-width: 900px) {
+  .left-bar {
+    display: none;
+  }
+  .task-manager {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .right-bar,
+  .page-content {
+    width: 100%;
+    display: block;
+  }
+  .tasks-wrapper {
+    height: auto;
+  }
+}
+@media screen and (max-width: 520px) {
+  .page-content {
+    padding: 40px 10px 0 10px;
+  }
+  .right-content {
+    padding: 10px 16px;
+  }
+  .category {
+    padding: 20px;
+  }
+}
+/* ======================================================
+   MEDIA QUERY FOR LARGE SCREENS (1200px+)
+===================================================== */
+@media screen and (min-width: 1200px) {
+  body {
+    font-size: 14px;
+  }
+  .logo-text {
+    font-size: 24px;
+  }
+  .page-content .header {
+    font-size: 32px;
+  }
+  .category {
+    padding: 25px 35px;
+  }
+  .task {
+    font-size: 15px;
+  }
+}

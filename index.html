@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager</title>
+  <link href="https://fonts.googleapis.com/css?family=DM+Sans:400,500,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"> <!-- Link to your external CSS -->
+  <script src="script.js"></script>
+</head>
+<body>
+  <!-- ======================================================
+       MAIN CONTAINER START
+  ====================================================== -->
+  <div class="task-manager">
+  
+    <!-- ======================================================
+         LEFT BAR START
+    ====================================================== -->
+    <div class="left-bar">
+      
+      <!-- LOGO / TITLE -->
+      <div class="logo-container">
+        <h1 class="logo-text">TareaFlow</h1>
+      </div>
+      
+      <!-- UPPER PART -->
+      <div class="upper-part">
+        <div class="actions">
+          <div class="circle"></div>
+          <div class="circle-2"></div>
+        </div>
+      </div>
+      
+      <!-- LEFT CONTENT -->
+      <div class="left-content">
+        <ul class="action-list">
+          <li class="item"><span>Tasks</span></li>
+          <li class="item"><span>Holidays</span></li>
+          <li class="item"><span>Administration</span></li>
+        </ul>
+      </div>
+      
+    </div>
+    <!-- ======================================================
+         LEFT BAR END
+    ====================================================== -->
+    
+    <!-- ======================================================
+         PAGE CONTENT START
+    ====================================================== -->
+    <div class="page-content">
+      
+      <!-- ADD CATEGORY & ADD TASK BUTTONS -->
+      <div class="label-wrapper add-category-wrapper">
+        <button class="add-category-btn" onclick="openCategoryModal()">+ Add Category</button>
+        <button class="add-task-btn" onclick="openTaskModal()">+ Add Task</button>
+      </div>
+      
+      <!-- CATEGORY TABS -->
+      <!-- CATEGORY TABS -->
+      <!-- CATEGORY TABS -->
+<div class="content-categories">
+  <!-- Visible Categories -->
+  <!-- Navigation Tabs for Task Manager -->
+  <nav class="category-tabs">
+    <span class="active-indicator"></span>
+    <ul id="categoryList">
+      <li class="active" data-category="all">All</li>
+      <li data-category="important">Important</li>
+      <li data-category="notes">Notes</li>
+      <li data-category="links">Links</li>
+    </ul>
+  </nav>
+  
+  
+  
+  
+  
+  
+  <!-- COLUMNS HEADER FOR TASKS -->
+  <div class="columns-header">
+    <div class="tasks-description">Category</div>
+    <div class="tasks-description">Assigned</div>
+    <div class="tasks-description">Due Date</div>
+    <div class="tasks-description">Days Left</div>
+    <div class="tasks-description">Status</div>
+  </div>
+</div>
+      <!-- END CATEGORY TABS -->
+      
+      <!-- COLLAPSIBLE SECTION: TODAY TASKS -->
+      <div class="header upcoming collapsible-header" data-target="#todayTasks">
+        <span class="collapse-icon">&#9660;</span>
+        <span class="title">Today Tasks</span>
+      </div>
+      <div class="tasks-wrapper collapsible-content" id="todayTasks">
+        <!-- TASK ITEM -->
+        <div class="task">
+          <input class="task-item" name="task" type="checkbox" id="item-1" checked>
+          <label for="item-1">
+            <span class="label-text">Dashboard Design Implementation</span>
+          </label>
+          <div class="tag progress-wrapper">
+            <div class="tag progress">In Progress</div>
+            <div class="tag progress">2024</div>
+            <div class="tag progress">Ale</div>
+          </div>
+        </div>
+        <!-- TASK ITEM -->
+        <div class="task">
+          <input class="task-item" name="task" type="checkbox" id="item-2" checked>
+          <label for="item-2">
+            <span class="label-text">Create a Userflow</span>
+          </label>
+          <div class="tag progress-wrapper">
+            <div class="tag progress">In Progress</div>
+            <div class="tag progress">2024</div>
+            <div class="tag progress">Ale</div>
+          </div>
+        </div>
+        <!-- TASK ITEM (Duplicate Example) -->
+        <div class="task">
+          <input class="task-item" name="task" type="checkbox" id="item-3" checked>
+          <label for="item-3">
+            <span class="label-text">Create a Userflow</span>
+          </label>
+          <div class="tag progress-wrapper">
+            <div class="tag progress">In Progress</div>
+            <div class="tag progress">2024</div>
+            <div class="tag progress">Ale</div>
+          </div>
+        </div>
+        <!-- TASK ITEM (Duplicate Example) -->
+        <div class="task">
+          <input class="task-item" name="task" type="checkbox" id="item-4" checked>
+          <label for="item-4">
+            <span class="label-text">Create a Userflow</span>
+          </label>
+          <div class="tag progress-wrapper">
+            <div class="tag progress">In Progress</div>
+            <div class="tag progress">2024</div>
+            <div class="tag progress">Ale</div>
+          </div>
+        </div>
+        <!-- TASK ITEM (Duplicate Example) -->
+        <div class="task">
+          <input class="task-item" name="task" type="checkbox" id="item-5" checked>
+          <label for="item-5">
+            <span class="label-text">Create a Userflow</span>
+          </label>
+          <div class="tag progress-wrapper">
+            <div class="tag progress">In Progress</div>
+            <div class="tag progress">2024</div>
+            <div class="tag progress">Ale</div>
+          </div>
+        </div>
+      </div>
+      <!-- END COLLAPSIBLE: TODAY TASKS -->
+      
+      <!-- COLLAPSIBLE SECTION: UPCOMING -->
+      <div class="header upcoming collapsible-header" data-target="#upcomingTasks">
+        <span class="collapse-icon">&#9660;</span> Upcoming
+      </div>
+      <div class="tasks-wrapper collapsible-content" id="upcomingTasks">
+        <!-- TASK ITEM -->
+        <div class="task">
+          <input class="task-item" name="task" type="checkbox" id="item-6" checked>
+          <label for="item-6">
+            <span class="label-text">Dashboard Design Implementation</span>
+          </label>
+          <div class="tag progress-wrapper">
+            <div class="tag progress">In Progress</div>
+            <div class="tag progress">2024</div>
+            <div class="tag progress">Ale</div>
+          </div>
+        </div>
+        <!-- TASK ITEM -->
+        <div class="task">
+          <input class="task-item" name="task" type="checkbox" id="item-7" checked>
+          <label for="item-7">
+            <span class="label-text">Create a Userflow</span>
+          </label>
+          <div class="tag progress-wrapper">
+            <div class="tag progress">In Progress</div>
+            <div class="tag progress">2024</div>
+            <div class="tag progress">Ale</div>
+          </div>
+        </div>
+      </div>
+      <!-- END COLLAPSIBLE: UPCOMING -->
+      
+      <!-- COLLAPSIBLE SECTION: DONE -->
+      <div class="header upcoming collapsible-header" data-target="#doneTasks">
+        <span class="collapse-icon">&#9660;</span> Done
+      </div>
+      <div class="tasks-wrapper collapsible-content" id="doneTasks">
+        <!-- TASK ITEM -->
+        <div class="task">
+          <input class="task-item" name="task" type="checkbox" id="item-8" checked>
+          <label for="item-8">
+            <span class="label-text">Dashboard Design Implementation</span>
+          </label>
+          <div class="tag progress-wrapper">
+            <div class="tag progress">In Progress</div>
+            <div class="tag progress">2024</div>
+            <div class="tag progress">Ale</div>
+          </div>
+        </div>
+        <!-- TASK ITEM -->
+        <div class="task">
+          <input class="task-item" name="task" type="checkbox" id="item-9" checked>
+          <label for="item-9">
+            <span class="label-text">Create a Userflow</span>
+          </label>
+          <div class="tag progress-wrapper">
+            <div class="tag progress">In Progress</div>
+            <div class="tag progress">2024</div>
+            <div class="tag progress">Ale</div>
+          </div>
+        </div>
+      </div>
+      <!-- END COLLAPSIBLE: DONE -->
+    </div>
+    <!-- END PAGE CONTENT -->
+    
+    <!-- ======================================================
+         RIGHT BAR START
+    ====================================================== -->
+    <div class="right-bar">
+      <!-- RIGHT BAR TOP SECTION -->
+      <div class="top-part">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+             class="feather feather-users">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        <div class="count">6</div>
+      </div>
+      <!-- RIGHT BAR HEADER -->
+      <div class="header">Notes</div>
+      <!-- NOTE BUTTON WRAPPER -->
+      <div class="note-button-wrapper">
+        <button class="add-note-btn" onclick="openNoteModal()">+ Add Note</button>
+      </div>
+      <!-- RIGHT CONTENT (NOTES CONTAINER) -->
+      <div class="right-content" id="notes-container"></div>
+    </div>
+    <!-- END RIGHT BAR -->
+    
+    <!-- ======================================================
+         MODALS
+    ====================================================== -->
+    
+    <!-- MODAL FOR ADDING NOTES -->
+    <div id="noteModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeNoteModal()">&times;</span>
+        <h2>Add a Note</h2>
+        <input type="text" id="note-title" class="modal-input" placeholder="Enter note title">
+        <textarea id="note-description" class="modal-textarea" placeholder="Enter note description"></textarea>
+        <button class="save-note-btn" onclick="addNote()">Save Note</button>
+      </div>
+    </div>
+    
+    <!-- MODAL FOR ADDING TASK -->
+    <div id="taskModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeTaskModal()">&times;</span>
+        <h2>Add a Task</h2>
+        <!-- Task Category -->
+        <label for="task-category">Category (Optional):</label>
+        <select id="task-category" class="modal-input">
+          <option value="">Select Category</option>
+          <!-- Future categories will be added here dynamically -->
+        </select>
+        <!-- Task Title -->
+        <input type="text" id="task-title" class="modal-input" placeholder="Enter task title" required>
+        <!-- Task Description -->
+        <textarea id="task-description" class="modal-textarea" placeholder="Enter task description (Optional)"></textarea>
+        <!-- Assigned User (Editable Select Dropdown) -->
+        <label for="task-assigned">Assigned To (Optional):</label>
+        <div class="custom-select">
+          <input type="text" id="task-assigned" class="modal-input assigned-input" placeholder="Enter or select a name">
+          <select id="task-assigned-select" class="modal-input">
+            <option value="">Select Assignee</option>
+            <!-- Future assigned names will be added here dynamically -->
+          </select>
+        </div>
+        <!-- Due Date Picker -->
+        <label for="task-due-date" class="modal-label">Due Date (Optional):</label>
+        <input type="date" id="task-due-date" class="modal-input modal-top-padding">
+        <!-- Task Status -->
+        <label for="task-status" class="modal-label">Status:</label>
+        <select id="task-status" class="modal-input modal-top-padding">
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+          <option value="Pending">Pending</option>
+        </select>
+        <button class="save-task-btn" onclick="addTask()">Save Task</button>
+      </div>
+    </div>
+    
+    <!-- MODAL FOR ADDING CATEGORY -->
+    <div id="categoryModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeCategoryModal()">&times;</span>
+        <h2>Add a Category</h2>
+        <input type="text" id="category-name" class="modal-input" placeholder="Enter category name">
+        <button class="save-category-btn" onclick="addCategory()">Save Category</button>
+      </div>
+    </div>
+    <!-- ======================================================
+         MODALS END
+    ====================================================== -->
+    
+  </div>
+  <!-- ======================================================
+       MAIN CONTAINER END
+  ====================================================== -->
+</body>
+</html>
