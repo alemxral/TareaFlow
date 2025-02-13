@@ -184,6 +184,61 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+function addCategory() {
+    const categoryName = document.getElementById("category-name").value.trim();
+    const categoryList = document.getElementById("categoryList");
+
+    if (categoryName === "") {
+        alert("Please enter a category name!");
+        return;
+    }
+
+    // Create new category list item
+    const newCategory = document.createElement("li");
+    newCategory.textContent = categoryName;
+    newCategory.setAttribute("data-category", categoryName.toLowerCase());
+    
+    // Append new category to list
+    categoryList.appendChild(newCategory);
+
+    // Clear input field
+    document.getElementById("category-name").value = "";
+
+    // Close modal
+    closeCategoryModal();
+}
+
+// Function to open the category modal
+function openCategoryModal() {
+    document.getElementById("categoryModal").style.display = "flex";
+}
+
+function addCategory() {
+    const categoryName = document.getElementById("category-name").value.trim();
+    const categoryList = document.getElementById("categoryList");
+
+    if (categoryName === "") {
+        alert("Please enter a category name!");
+        return;
+    }
+
+    // Create new category list item
+    const newCategory = document.createElement("li");
+    newCategory.textContent = categoryName;
+    newCategory.setAttribute("data-category", categoryName.toLowerCase());
+    
+    // Append new category to list
+    categoryList.appendChild(newCategory);
+
+    // Clear input field
+    document.getElementById("category-name").value = "";
+
+    // Close modal
+    closeCategoryModal();
+}
+
+
+
 
 
 

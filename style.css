@@ -31,6 +31,11 @@
   --primary-color: #185ee0;
   --secondary-color: #e6eef9;
   --bg-nav: rgba(255, 255, 255, 0.05);
+  --primary-color: #009e90;
+  --secondary-color: #e6eef9;
+  --text-color: #5d606b;
+  --tab-bg: #f5f8ff;
+  --tab-hover: rgba(0, 158, 144, 0.15);
 }
 
 /* Shared Display Properties */
@@ -125,10 +130,11 @@ button {
    LEFT BAR & CONTENT
 ===================================================== */
 .left-bar {
-  background-color: var(--bg-color);
-  width: 230px;
-  border-right: 1px solid #e3e7f7;
-  position: relative;
+  width: 230px; /* Default */
+  min-width: 160px;
+  max-width: 200px;
+  transition: width 0.3s ease-in-out;
+  
 }
 
 .left-content {
@@ -179,7 +185,7 @@ button {
    RIGHT BAR & CONTENT
 ===================================================== */
 .right-bar {
-  width: 320px;
+  width: 280px;
   border-left: 1px solid #e3e7f7;
   display: flex;
   flex-direction: column;
@@ -233,10 +239,11 @@ button {
   margin: 10px 0 5px;
   padding-bottom: 10px;
 }
+
 .content-categories {
   display: flex;
   align-items: flex-start;
-  justify-content: flex-start;
+  justify-content: flex-end;
   gap: 5px;
   width: 100%;
   padding: 10px 0;
@@ -252,25 +259,21 @@ button {
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
 
-/* Root Variables */
-:root {
-  --primary-color: #009e90;
-  --secondary-color: #e6eef9;
-  --text-color: #5d606b;
-  --tab-bg: #f5f8ff;
-  --tab-hover: rgba(0, 158, 144, 0.15);
-}
+
 
 /* Category Tabs Navigation */
 .category-tabs {
-  position: relative;
+ 
+  display: flex;
+  flex: 1;
   border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--grey);
   padding: 5px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1),
               0 2px 2px rgba(0, 0, 0, 0.1),
               0 4px 4px rgba(0, 0, 0, 0.1);
   width: fit-content;
+
 }
 
 /* Category Tabs List */
@@ -319,18 +322,6 @@ button {
   z-index: -1;
 }
 
-/* Responsive Adjustments */
-@media screen and (max-width: 700px) {
-  .category-tabs ul {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .category-tabs li {
-    font-size: 0.75rem;
-    padding: 6px 10px;
-  }
-}
 
 
 
@@ -340,6 +331,7 @@ button {
 .tasks-wrapper {
   display: flex;
   flex-direction: column;
+  
   gap: 16px;
   padding: 15px 20px;
   overflow-y: visible;
@@ -439,14 +431,23 @@ label .label-text:before {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  padding: 6px;
+  border-radius: 5px;
+  
   flex-grow: 1;
+  background-color: var(--grey);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1),
+              0 2px 2px rgba(0, 0, 0, 0.1),
+              0 4px 4px rgba(0, 0, 0, 0.1);
+  width: auto;
 }
+
 .tasks-description {
   background-color: var(--grey);
-  color: black;
-  font-size: 10px;
+  color: var(--text-color);
+  font-size: 0.9rem;
   font-weight: 500;
-  border-radius: 20px;
+  border-radius: 5px;
   width: 80px;
   height: 30px;
   display: flex;
@@ -454,6 +455,7 @@ label .label-text:before {
   justify-content: center;
   white-space: nowrap;
   overflow: hidden;
+  cursor: pointer;
   text-overflow: ellipsis;
 }
 
@@ -690,56 +692,3 @@ label .label-text:before {
   pointer-events: auto;
 }
 
-
-
-/* ======================================================
-   RESPONSIVE STYLES
-===================================================== */
-@media screen and (max-width: 900px) {
-  .left-bar {
-    display: none;
-  }
-  .task-manager {
-    flex-direction: column;
-    overflow-y: auto;
-  }
-  .right-bar,
-  .page-content {
-    width: 100%;
-    display: block;
-  }
-  .tasks-wrapper {
-    height: auto;
-  }
-}
-@media screen and (max-width: 520px) {
-  .page-content {
-    padding: 40px 10px 0 10px;
-  }
-  .right-content {
-    padding: 10px 16px;
-  }
-  .category {
-    padding: 20px;
-  }
-}
-/* ======================================================
-   MEDIA QUERY FOR LARGE SCREENS (1200px+)
-===================================================== */
-@media screen and (min-width: 1200px) {
-  body {
-    font-size: 14px;
-  }
-  .logo-text {
-    font-size: 24px;
-  }
-  .page-content .header {
-    font-size: 32px;
-  }
-  .category {
-    padding: 25px 35px;
-  }
-  .task {
-    font-size: 15px;
-  }
-}
