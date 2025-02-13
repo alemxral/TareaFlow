@@ -45,6 +45,21 @@ function safelyExecute(callback, fallback = () => {}) {
     }
 }
 
+
+document.addEventListener("DOMContentLoaded", function () {
+    const notesContainer = document.getElementById("notes-container");
+
+    // Attach click event to dynamically open notes
+    notesContainer.addEventListener("click", function (event) {
+        const noteBox = event.target.closest(".task-box");
+        if (noteBox) {
+            const noteTitle = noteBox.querySelector(".task-name").textContent;
+            const noteDescription = noteBox.getAttribute("data-description"); // Get stored description
+            openViewNoteModal(noteTitle, noteDescription);
+        }
+    });
+});
+
 // Modal Functions
 function openNoteModal() { safelyExecute(() => { document.getElementById("noteModal").style.display = "flex"; }); }
 function closeNoteModal() { safelyExecute(() => { document.getElementById("noteModal").style.display = "none"; }); }
@@ -67,23 +82,51 @@ function addNote() {
 
         const noteBox = document.createElement("div");
         noteBox.classList.add("task-box", "blue");
+        noteBox.setAttribute("data-description", noteDescription); // Store description for later retrieval
         noteBox.innerHTML = `
             <div class="description-task">
                 <div class="time">${new Date().toLocaleTimeString()}</div>
                 <div class="task-name">${noteTitle}</div>
-                <p>${noteDescription}</p>
             </div>
-            <button class="delete-note-btn" onclick="deleteNote(this)">Delete</button>
+           
         `;
 
+        // Append to the Notes Container
         notesContainer.prepend(noteBox);
+
+        // Clear Inputs
         document.getElementById("note-title").value = "";
         document.getElementById("note-description").value = "";
+
+        // Close Modal
         closeNoteModal();
     });
 }
 
-function deleteNote(button) { safelyExecute(() => { button.parentElement.remove(); }); }
+// Function to Open the Note View Modal with Content
+function openViewNoteModal(title, description) {
+    if (!description) description = "No details available."; // Fallback if missing
+    document.getElementById("view-note-title").textContent = title;
+    document.getElementById("view-note-description").textContent = description;
+    document.getElementById("viewNoteModal").style.display = "flex";
+}
+
+// Function to Close Note View Modal
+function closeViewNoteModal() {
+    document.getElementById("viewNoteModal").style.display = "none";
+}
+
+// Function to Delete a Note
+function deleteNote(button) {
+    button.parentElement.remove();
+}
+
+
+
+
+
+
+
 
 window.onclick = function(event) {
     safelyExecute(() => {
@@ -146,17 +189,11 @@ function addTask() {
 
 
 
-
 document.addEventListener("DOMContentLoaded", function () {
     const categoryList = document.getElementById("categoryList");
-    const tabs = categoryList.querySelectorAll("li");
 
     if (!categoryList) {
         console.error("Error: categoryList element not found");
-        return;
-    }
-    if (tabs.length === 0) {
-        console.error("Error: No tabs found inside categoryList");
         return;
     }
 
@@ -166,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Tab clicked:", selectedTab.textContent);
 
         // Remove active class from all tabs
-        tabs.forEach(tab => tab.classList.remove("active"));
+        document.querySelectorAll("#categoryList li").forEach(tab => tab.classList.remove("active"));
         
         // Add active class to selected tab
         selectedTab.classList.add("active");
@@ -174,13 +211,14 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Active tab updated to:", selectedTab.textContent);
     }
 
-    // Add click event to each tab
-    tabs.forEach(tab => {
-        tab.addEventListener("click", function () {
-            updateActiveTab(this);
-        });
+    // Use event delegation to handle clicks on dynamically added tabs
+    categoryList.addEventListener("click", function (event) {
+        if (event.target.tagName === "LI") {
+            updateActiveTab(event.target);
+        }
     });
 });
+
 
 
 
