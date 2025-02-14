@@ -9,8 +9,30 @@ function safelyExecute(callback, fallback = () => {}) {
     }
 }
 
+function safelyExecuteAsync(asyncCallback, fallback = () => {}) {
+    asyncCallback().catch(error => {
+        console.error("An error occurred (async):", error);
+        fallback();
+    });
+}
+
+
+
+
+
+
 /* ====================== MODAL FUNCTIONS ====================== */
-function openTaskModal()  { safelyExecute(() => { document.getElementById("taskModal").style.display = "flex"; }); }
+function openTaskModal() {
+    safelyExecuteAsync(async () => {
+        // First, populate the category dropdown
+        await populateCategoryDropdown();
+        
+        // Then show the task modal
+        document.getElementById("taskModal").style.display = "flex";
+    });
+}
+
+
 function closeTaskModal() { safelyExecute(() => { document.getElementById("taskModal").style.display = "none"; }); }
 
 function openCategoryModal()  { safelyExecute(() => { document.getElementById("categoryModal").style.display = "flex"; }); }
@@ -129,35 +151,37 @@ document.addEventListener("DOMContentLoaded", initializeApp);
 
 /* ====================== CLASSIFY TASKS ====================== */
 function classifyTask(task) {
-    const todayWrapper    = document.getElementById("todayTasks");
+    const todayWrapper = document.getElementById("todayTasks");
     const upcomingWrapper = document.getElementById("upcomingTasks");
-    const doneWrapper     = document.getElementById("doneTasks");
-
-    // Create task element
+    const doneWrapper = document.getElementById("doneTasks");
+  
     const taskElement = document.createElement("div");
     taskElement.classList.add("task");
+    // Store the category as a data attribute
+    taskElement.setAttribute("data-category", task.category.toLowerCase());
+    
     taskElement.innerHTML = `
-        <input class="task-item" name="task" type="checkbox" id="${task.id}" ${task.done ? 'checked' : ''}>
-        <label for="${task.id}">
-          <span class="label-text">${task.title}</span>
-        </label>
-        <div class="tag progress-wrapper">
-            <div class="tag progress">${task.category}</div>
-            <div class="tag progress">${task.assigned}</div>
-            <div class="tag progress">${task.dueDate || "No due date"}</div>
-            <div class="tag progress">${task.status}</div>
-        </div>
+      <input class="task-item" name="task" type="checkbox" id="${task.id}" ${task.done ? "checked" : ""}>
+      <label for="${task.id}">
+        <span class="label-text">${task.title}</span>
+      </label>
+      <div class="tag progress-wrapper">
+        <div class="tag progress">${task.category}</div>
+        <div class="tag progress">${task.assigned}</div>
+        <div class="tag progress">${task.dueDate || "No due date"}</div>
+        <div class="tag progress">${task.status}</div>
+      </div>
     `;
-
-    // Decide which wrapper to prepend
+  
     if (task.done) {
-        doneWrapper.prepend(taskElement);
+      doneWrapper.prepend(taskElement);
     } else if (!task.dueDate || new Date(task.dueDate).toDateString() === new Date().toDateString()) {
-        todayWrapper.prepend(taskElement);
+      todayWrapper.prepend(taskElement);
     } else {
-        upcomingWrapper.prepend(taskElement);
+      upcomingWrapper.prepend(taskElement);
     }
-}
+  }
+  
 
 /* ====================== ADD TASK ====================== */
 async function addTask() {
@@ -204,6 +228,27 @@ async function editTask(id) {
     document.getElementById("doneTasks").innerHTML = "";
     initializeApp();
 }
+
+// Filter tasks based on category
+function filterTasks(categoryName) {
+    // Convert to lowercase for consistent matching
+    const targetCat = categoryName.toLowerCase();
+  
+    document.querySelectorAll(".task").forEach(taskEl => {
+      const taskCat = taskEl.getAttribute("data-category") || "no category";
+  
+      if (targetCat === "all" || taskCat === targetCat) {
+        // Show matching tasks
+        taskEl.style.display = "flex"; 
+      } else {
+        // Hide non-matching tasks
+        taskEl.style.display = "none";
+      }
+    });
+  }
+  
+
+
 
 /* ====================== CATEGORY CLASS ====================== */
 class Category {
@@ -263,4 +308,70 @@ function addCategoryToUI(category) {
     newCategory.setAttribute("data-category", category.name.toLowerCase());
     categoryList.appendChild(newCategory);
 }
+
+
+
+
+/* ====================== CATEGORY Navigation Effects====== */
+document.addEventListener("DOMContentLoaded", function () {
+    const categoryList = document.getElementById("categoryList");
+
+    if (!categoryList) {
+        console.error("Error: categoryList element not found");
+        return;
+    }
+
+    console.log("Category list and tabs initialized successfully");
+
+    function updateActiveTab(selectedTab) {
+        console.log("Tab clicked:", selectedTab.textContent);
+    
+        // Remove 'active' class from all tabs
+        document.querySelectorAll("#categoryList li").forEach(tab => tab.classList.remove("active"));
+    
+        // Add 'active' class to selected tab
+        selectedTab.classList.add("active");
+    
+        // Filter tasks based on the clicked category
+        const clickedCategory = selectedTab.getAttribute("data-category"); // e.g., "important", "notes", "all", etc.
+        filterTasks(clickedCategory);
+    
+        console.log("Active tab updated to:", selectedTab.textContent);
+    }
+    
+
+    // Use event delegation to handle clicks on dynamically added tabs
+    categoryList.addEventListener("click", function (event) {
+        if (event.target.tagName === "LI") {
+            updateActiveTab(event.target);
+        }
+    });
+});
+
+
+// Populate the category dropdown for tasks
+async function populateCategoryDropdown() {
+    const categorySelect = document.getElementById("task-category");
+    if (!categorySelect) return; // Safety check
+  
+    // Clear existing options (keep the default placeholder)
+    categorySelect.innerHTML = `<option value="">Select Category</option>`;
+  
+    // Load all categories from your storage
+    const categories = await Category.loadAll();
+    if (!Array.isArray(categories)) {
+      console.error("Error: categories data is not an array =>", categories);
+      return;
+    }
+  
+    // For each category, create an <option>
+    categories.forEach(cat => {
+      const option = document.createElement("option");
+      // The <option> value is the category name
+      option.value = cat.name;
+      option.textContent = cat.name; 
+      categorySelect.appendChild(option);
+    });
+  }
+  
 
