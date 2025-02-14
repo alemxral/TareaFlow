@@ -35,6 +35,9 @@ function openTaskModal() {
 
 function closeTaskModal() { safelyExecute(() => { document.getElementById("taskModal").style.display = "none"; }); }
 
+function openNoteModal() { safelyExecute(() => { document.getElementById("noteModal").style.display = "flex"; }); }
+function closeNoteModal() { safelyExecute(() => { document.getElementById("noteModal").style.display = "none"; }); }
+
 function openCategoryModal()  { safelyExecute(() => { document.getElementById("categoryModal").style.display = "flex"; }); }
 function closeCategoryModal() { safelyExecute(() => { document.getElementById("categoryModal").style.display = "none"; }); }
 
@@ -375,3 +378,253 @@ async function populateCategoryDropdown() {
   }
   
 
+
+/* ======================Notes====================== */
+
+// Function to Add Note
+async function addNote() {
+    const noteTitle = document.getElementById("note-title").value.trim();
+    const noteDescription = document.getElementById("note-description").value.trim();
+
+    if (!noteTitle) {
+        alert("Please enter a note title!");
+        return;
+    }
+
+    // Add a new note to notes.json via the Note class
+    const newNote = await Note.add(noteTitle, noteDescription);
+
+    // Immediately show the new note in the UI
+    const notesContainer = document.getElementById("notes-container");
+
+    const noteBox = document.createElement("div");
+    noteBox.classList.add("task-box", "blue");
+    noteBox.setAttribute("data-description", newNote.description); // Store description for later retrieval
+
+    noteBox.innerHTML = `
+        <div class="description-task">
+            <div class="time">${new Date().toLocaleTimeString()}</div>
+            <div class="task-name">${newNote.title}</div>
+        </div>
+    `;
+
+    // Append the note to the container
+    notesContainer.prepend(noteBox);
+
+    // Clear input fields & close the modal
+    document.getElementById("note-title").value = "";
+    document.getElementById("note-description").value = "";
+    closeNoteModal();
+}
+
+
+
+
+
+
+// ========== 2) Note Class ==========
+class Note {
+    constructor(title, description) {
+        this.id = `note-${Date.now()}`;
+        this.title = title;
+        this.description = description;
+        this.timestamp = new Date().toLocaleString();
+    }
+
+    // Add a new note to notes.json
+    static async add(title, description) {
+        const note = new Note(title, description);
+
+        let notes = await StorageManager.loadData("notes");
+        if (!Array.isArray(notes)) {
+            console.error("Error: notes is not an array =>", notes);
+            notes = notes ? [notes] : [];
+        }
+        notes.push(note);
+        await StorageManager.saveData("notes", notes);
+        return note;
+    }
+
+    // Load all notes
+    static async loadAll() {
+        let notes = await StorageManager.loadData("notes");
+        return Array.isArray(notes) ? notes : [];
+    }
+
+    // Edit an existing note in notes.json
+    static async edit(id, newTitle, newDesc) {
+        let notes = await StorageManager.loadData("notes");
+        notes = notes.map(n => n.id === id ? { ...n, title: newTitle, description: newDesc } : n);
+        await StorageManager.saveData("notes", notes);
+    }
+
+    // Delete a note by id
+    static async delete(id) {
+        let notes = await StorageManager.loadData("notes");
+        notes = notes.filter(n => n.id !== id);
+        await StorageManager.saveData("notes", notes);
+    }
+}
+
+// ========== 3) Initialize / Load / Display Notes ==========
+async function initializeNotes() {
+    const notes = await Note.loadAll();
+    if (!Array.isArray(notes)) {
+        console.error("Error: loaded notes is not an array =>", notes);
+        return;
+    }
+    document.getElementById("notes-container").innerHTML = ""; // Clear the container
+    notes.forEach(addNoteToUI);
+}
+
+// On page load, initialize
+document.addEventListener("DOMContentLoaded", initializeNotes);
+
+// ========== 4) Add Note UI/Logic ==========
+async function addNote() {
+    const noteTitle = document.getElementById("note-title").value.trim();
+    const noteDesc = document.getElementById("note-description").value.trim();
+
+    if (!noteTitle) {
+        alert("Please enter a note title!");
+        return;
+    }
+
+    const newNote = await Note.add(noteTitle, noteDesc);
+    addNoteToUI(newNote);
+
+    // Reset fields & close modal
+    document.getElementById("note-title").value = "";
+    document.getElementById("note-description").value = "";
+    closeNoteModal();
+}
+
+// ========== 5) Note Box UI ==========
+// (No style class changes, simply add data-id and data-description for easier access.)
+function addNoteToUI(note) {
+    const notesContainer = document.getElementById("notes-container");
+    const noteBox = document.createElement("div");
+    noteBox.classList.add("note-box");  // Keep your existing class
+
+    // Store note info in data attributes
+    noteBox.setAttribute("data-id", note.id);
+    noteBox.setAttribute("data-description", note.description);
+
+    noteBox.innerHTML = `
+        <div class="note-title">${note.title}</div>
+        <div class="note-description">${note.description}</div>
+        <div class="note-time">${note.timestamp}</div>
+    `;
+
+    notesContainer.prepend(noteBox);
+}
+
+// ========== 6) View/Edit Modal Logic ==========
+let currentNoteId = null;
+
+function openViewNoteModal(noteId, title, description) {
+    currentNoteId = noteId;
+    // Fill your bigger modal fields
+    document.getElementById("edit-note-title").value = title;
+    document.getElementById("edit-note-description").value = description;
+
+    // Show the modal
+    document.getElementById("viewNoteModal").style.display = "flex";
+}
+
+
+function closeViewNoteModal() {
+    document.getElementById("viewNoteModal").style.display = "none";
+    currentNoteId = null;
+}
+
+// Save changes in the view/edit modal
+async function saveNoteChanges() {
+    if (!currentNoteId) return;
+
+    const updatedTitle = document.getElementById("edit-note-title").value.trim();
+    const updatedDesc  = document.getElementById("edit-note-description").value.trim();
+    if (!updatedTitle) {
+        alert("Note title is required!");
+        return;
+    }
+
+    await Note.edit(currentNoteId, updatedTitle, updatedDesc);
+    closeViewNoteModal();
+    initializeNotes(); // Refresh UI
+}
+
+// Delete the note from the view/edit modal
+async function deleteNote() {
+    if (!currentNoteId) return;
+
+    await Note.delete(currentNoteId);
+    closeViewNoteModal();
+    initializeNotes(); // Refresh UI
+}
+
+// ========== 7) Click Handler to Open the View/Edit Modal ==========
+// This ensures that when the user clicks anywhere inside a .note-box, 
+// we retrieve the note’s ID, title, and description to populate the larger modal.
+
+document.getElementById("notes-container").addEventListener("click", function (event) {
+    // Find the closest .note-box ancestor from the click target
+    const noteBox = event.target.closest(".note-box");
+    if (!noteBox) return; // If click was not on a note
+
+    // Extract data from attributes/child elements
+    const noteId = noteBox.getAttribute("data-id");
+    const noteTitle = noteBox.querySelector(".note-title").textContent;
+    const noteDescription = noteBox.getAttribute("data-description");
+
+    // Now open the bigger edit modal
+    openViewNoteModal(noteId, noteTitle, noteDescription);
+});
+
+// ========== 8) Modal Handling ==========
+function openNoteModal() {
+    document.getElementById("noteModal").style.display = "flex";
+}
+function closeNoteModal() {
+    document.getElementById("noteModal").style.display = "none";
+}
+
+// =========Collapsables================
+
+document.addEventListener("DOMContentLoaded", () => {
+    try {
+        console.log("DOM content loaded – initializing collapsibles...");
+
+        const collapsibleHeaders = document.querySelectorAll(".collapsible-header");
+        console.log(`Found ${collapsibleHeaders.length} collapsible headers.`);
+
+        collapsibleHeaders.forEach((header, index) => {
+            console.log(`Attaching click listener to header #${index + 1}`);
+            
+            header.addEventListener("click", () => {
+                try {
+                    console.log(`Header #${index + 1} clicked.`);
+                    header.classList.toggle("collapsed");
+                    console.log(`Header #${index + 1} class list:`, header.classList);
+
+                    const targetId = header.getAttribute("data-target");
+                    console.log(`Header #${index + 1} target id: ${targetId}`);
+
+                    if (targetId) {
+                        const content = document.querySelector(targetId);
+                        if (content) {
+                            content.classList.toggle("collapsed");
+                            console.log(`Toggled collapsed on content for ${targetId}`);
+                        } else {
+                            console.warn(`No element found with ID: ${targetId}`);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error handling collapsible header click:", error);
+                }
+            });
+        });
+    } catch (error) {
+        console.error("Error initializing collapsibles:", error);
+    }
+});

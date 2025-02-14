@@ -618,6 +618,8 @@ label .label-text:before {
   background-color: #007a73;
 }
 
+
+
 /* ======================================================
    ADD NOTE BUTTON & NOTE STYLING
 ===================================================== */
@@ -642,21 +644,7 @@ label .label-text:before {
   background-color: #007a73;
 }
 
-.delete-note-btn {
-  background-color: var(--checkbox-color);
-  color: #fff;
-  padding: 4px 6px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 6px;
-  font-weight: 250;
-  transition: background-color 0.2s ease-in-out;
-}
 
-
-.delete-note-btn:hover {
-  background-color: #007a73;
-}
 .task-box {
   position: relative;
   border-radius: 12px;
@@ -682,14 +670,66 @@ label .label-text:before {
   opacity: 0.6;
 }
 
-.task-box .delete-note-btn {
+.task-box  {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
 
-.task-box:hover .delete-note-btn {
+.task-box:hover  {
   opacity: 1;
   pointer-events: auto;
 }
 
+/* The large modal can be bigger for editing notes */
+.large-modal {
+  width: 50%;
+  max-width: 600px;
+  padding: 20px;
+}
+
+/* Buttons for the edit/delete row */
+.modal-btn-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+/* Basic style for note box (reusing .task-box style if you like) */
+.note-box {
+  position: relative;
+  border-radius: 12px;
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  background-color: #f9f9f9; /* Or var(--box-color) if you prefer */
+  box-shadow: 2px 2px 4px rgba(235,235,235,1);
+  cursor: pointer;
+  overflow: hidden;
+}
+.note-box:hover {
+  background-color: #f2f2f2;
+}
+.note-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+.note-time {
+  font-size: 10px;
+  opacity: 0.7;
+}
+.delete-note-btn {
+ 
+
+
+  margin-top: 10px;
+  background-color: #ff4d4d;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.delete-note-btn:hover {
+  background-color: #cc0000;
+}

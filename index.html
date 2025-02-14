@@ -6,7 +6,7 @@
   <title>Task Manager</title>
   <link href="https://fonts.googleapis.com/css?family=DM+Sans:400,500,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"> <!-- Link to your external CSS -->
-  <script src="script.js"></script>
+  
 </head>
 <body>
   <!-- ======================================================
@@ -67,9 +67,7 @@
     <span class="active-indicator"></span>
     <ul id="categoryList">
       <li class="active" data-category="all">All</li>
-      <li data-category="important">Important</li>
-      <li data-category="notes">Notes</li>
-      <li data-category="links">Links</li>
+    
     </ul>
   </nav>
   
@@ -83,7 +81,7 @@
     <div class="tasks-description">Category</div>
     <div class="tasks-description">Assigned</div>
     <div class="tasks-description">Due Date</div>
-    <div class="tasks-description">Days Left</div>
+  
     <div class="tasks-description">Status</div>
   </div>
 </div>
@@ -317,17 +315,26 @@
          MODALS END
     ====================================================== -->
     <!-- MODAL FOR VIEWING NOTE -->
+<!-- MODAL FOR VIEW/EDIT NOTES -->
 <div id="viewNoteModal" class="modal">
-  <div class="modal-content">
+  <div class="modal-content large-modal">
     <span class="close-btn" onclick="closeViewNoteModal()">&times;</span>
-    <h2 id="view-note-title"></h2>
-    <p id="view-note-description"></p>
+    <h2>Edit Note</h2>
+    <input type="text" id="edit-note-title" class="modal-input">
+    <textarea id="edit-note-description" class="modal-textarea"></textarea>
+    <div class="modal-btn-row">
+      <button class="save-note-btn" onclick="saveNoteChanges()">Save Changes</button>
+      <button class="delete-note-btn" onclick="deleteNote()">Delete Note</button>
+    </div>
   </div>
 </div>
+
 
   </div>
   <!-- ======================================================
        MAIN CONTAINER END
   ====================================================== -->
+
+  <script src="script.js"></script>
 </body>
 </html>
