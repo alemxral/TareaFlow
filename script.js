@@ -1,41 +1,5 @@
-document.addEventListener("DOMContentLoaded", () => {
-    try {
-        console.log("DOM content loaded – initializing collapsibles...");
 
-        const collapsibleHeaders = document.querySelectorAll(".collapsible-header");
-        console.log(`Found ${collapsibleHeaders.length} collapsible headers.`);
-
-        collapsibleHeaders.forEach((header, index) => {
-            console.log(`Attaching click listener to header #${index + 1}`);
-            
-            header.addEventListener("click", () => {
-                try {
-                    console.log(`Header #${index + 1} clicked.`);
-                    header.classList.toggle("collapsed");
-                    console.log(`Header #${index + 1} class list:`, header.classList);
-
-                    const targetId = header.getAttribute("data-target");
-                    console.log(`Header #${index + 1} target id: ${targetId}`);
-
-                    if (targetId) {
-                        const content = document.querySelector(targetId);
-                        if (content) {
-                            content.classList.toggle("collapsed");
-                            console.log(`Toggled collapsed on content for ${targetId}`);
-                        } else {
-                            console.warn(`No element found with ID: ${targetId}`);
-                        }
-                    }
-                } catch (error) {
-                    console.error("Error handling collapsible header click:", error);
-                }
-            });
-        });
-    } catch (error) {
-        console.error("Error initializing collapsibles:", error);
-    }
-});
-
+/* ====================== SAFELY EXECUTE ====================== */
 function safelyExecute(callback, fallback = () => {}) {
     try {
         callback();
@@ -45,247 +9,258 @@ function safelyExecute(callback, fallback = () => {}) {
     }
 }
 
-
-document.addEventListener("DOMContentLoaded", function () {
-    const notesContainer = document.getElementById("notes-container");
-
-    // Attach click event to dynamically open notes
-    notesContainer.addEventListener("click", function (event) {
-        const noteBox = event.target.closest(".task-box");
-        if (noteBox) {
-            const noteTitle = noteBox.querySelector(".task-name").textContent;
-            const noteDescription = noteBox.getAttribute("data-description"); // Get stored description
-            openViewNoteModal(noteTitle, noteDescription);
-        }
-    });
-});
-
-// Modal Functions
-function openNoteModal() { safelyExecute(() => { document.getElementById("noteModal").style.display = "flex"; }); }
-function closeNoteModal() { safelyExecute(() => { document.getElementById("noteModal").style.display = "none"; }); }
-function openTaskModal() { safelyExecute(() => { document.getElementById("taskModal").style.display = "flex"; }); }
+/* ====================== MODAL FUNCTIONS ====================== */
+function openTaskModal()  { safelyExecute(() => { document.getElementById("taskModal").style.display = "flex"; }); }
 function closeTaskModal() { safelyExecute(() => { document.getElementById("taskModal").style.display = "none"; }); }
-function openCategoryModal() { safelyExecute(() => { document.getElementById("categoryModal").style.display = "flex"; }); }
+
+function openCategoryModal()  { safelyExecute(() => { document.getElementById("categoryModal").style.display = "flex"; }); }
 function closeCategoryModal() { safelyExecute(() => { document.getElementById("categoryModal").style.display = "none"; }); }
 
-// Function to Add Note
-function addNote() {
-    safelyExecute(() => {
-        const noteTitle = document.getElementById("note-title").value.trim();
-        const noteDescription = document.getElementById("note-description").value.trim();
-        const notesContainer = document.getElementById("notes-container");
-
-        if (!noteTitle || !noteDescription) {
-            alert("Please enter both a title and a description!");
-            return;
+/* ====================== STORAGE MANAGER ====================== */
+class StorageManager {
+    static async saveData(filename, data) {
+        // Wrap data in { filename, data } so the server can save it to <filename>.json
+        const jsonData = JSON.stringify({ filename, data });
+        try {
+            const response = await fetch("http://localhost:8080/api/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: jsonData
+            });
+            console.log("Save response:", await response.text());
+        } catch (error) {
+            console.error("Error saving data:", error);
         }
+    }
 
-        const noteBox = document.createElement("div");
-        noteBox.classList.add("task-box", "blue");
-        noteBox.setAttribute("data-description", noteDescription); // Store description for later retrieval
-        noteBox.innerHTML = `
-            <div class="description-task">
-                <div class="time">${new Date().toLocaleTimeString()}</div>
-                <div class="task-name">${noteTitle}</div>
-            </div>
-           
-        `;
-
-        // Append to the Notes Container
-        notesContainer.prepend(noteBox);
-
-        // Clear Inputs
-        document.getElementById("note-title").value = "";
-        document.getElementById("note-description").value = "";
-
-        // Close Modal
-        closeNoteModal();
-    });
-}
-
-// Function to Open the Note View Modal with Content
-function openViewNoteModal(title, description) {
-    if (!description) description = "No details available."; // Fallback if missing
-    document.getElementById("view-note-title").textContent = title;
-    document.getElementById("view-note-description").textContent = description;
-    document.getElementById("viewNoteModal").style.display = "flex";
-}
-
-// Function to Close Note View Modal
-function closeViewNoteModal() {
-    document.getElementById("viewNoteModal").style.display = "none";
-}
-
-// Function to Delete a Note
-function deleteNote(button) {
-    button.parentElement.remove();
-}
-
-
-
-
-
-
-
-
-window.onclick = function(event) {
-    safelyExecute(() => {
-        const noteModal = document.getElementById("noteModal");
-        const taskModal = document.getElementById("taskModal");
-        if (event.target === noteModal) noteModal.style.display = "none";
-        if (event.target === taskModal) taskModal.style.display = "none";
-    });
-};
-
-function calculateDaysLeft(dueDate) {
-    return safelyExecute(() => {
-        if (!dueDate) return "No due date";
-        const due = new Date(dueDate);
-        const today = new Date();
-        const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
-        return diffDays >= 0 ? `${diffDays} days` : "Overdue";
-    }, () => "Invalid date");
-}
-
-// Function to Add Task
-function addTask() {
-    safelyExecute(() => {
-        const taskCategory = document.getElementById("task-category").value || "No Category";
-        const taskTitle = document.getElementById("task-title").value.trim();
-        const taskDescription = document.getElementById("task-description").value.trim();
-        const taskAssigned = document.getElementById("task-assigned").value.trim() || "Unassigned";
-        const taskDueDate = document.getElementById("task-due-date").value;
-        const taskStatus = document.getElementById("task-status").value || "In Progress";
-        
-        if (!taskTitle) {
-            alert("Task title is required!");
-            return;
+    static async loadData(filename) {
+        try {
+            // GET request to load <filename>.json from the server
+            const response = await fetch(`http://localhost:8080/api/load/${filename}`);
+            if (!response.ok) {
+                console.error("Error: Fetch request failed with status", response.status);
+                return [];
+            }
+            // The server typically returns either an array [ ... ] or { filename: "tasks", data: [...] }
+            const jsonData = await response.json();
+            
+            // If jsonData is an array => return it.
+            if (Array.isArray(jsonData)) {
+                return jsonData;
+            }
+            // If it's an object with a .data array => return that
+            if (jsonData && typeof jsonData === "object" && Array.isArray(jsonData.data)) {
+                return jsonData.data;
+            }
+            // If there's a .data property but not an array => wrap in array
+            if (jsonData && jsonData.data) {
+                console.warn("Warning: 'data' is not an array. Converting to array.");
+                return [jsonData.data];
+            }
+            // Otherwise, error
+            console.error("Error: Loaded data is not in expected format", jsonData);
+            return [];
+        } catch (error) {
+            console.error("Error loading data:", error);
+            return [];
         }
-
-        const taskId = "TASK-" + Math.floor(1000 + Math.random() * 9000);
-        const daysLeft = calculateDaysLeft(taskDueDate);
-        const taskWrapper = document.getElementById("todayTasks"); 
-
-        const taskElement = document.createElement("div");
-        taskElement.classList.add("task");
-        taskElement.innerHTML = `
-            <input class="task-item" name="task" type="checkbox" id="${taskId}">
-            <label for="${taskId}"><span class="label-text">${taskTitle}</span></label>
-            <div class="tag progress-wrapper">
-                <div class="tag progress">${taskCategory}</div>
-                <div class="tag progress">${taskAssigned}</div>
-                <div class="tag progress">${taskDueDate || "No due date"}</div>
-                <div class="tag progress">${daysLeft}</div>
-                <div class="tag progress">${taskStatus}</div>
-            </div>
-        `;
-
-        taskWrapper.prepend(taskElement);
-        closeTaskModal();
-    });
+    }
 }
 
+/* ====================== TASK CLASS ====================== */
+class Task {
+    constructor(title, category, assigned, dueDate, status, priority = "Normal", done = false) {
+        this.id = `task-${Date.now()}`;
+        this.title = title;
+        this.category = category;
+        this.assigned = assigned;
+        this.dueDate = dueDate;
+        this.status = status;
+        this.priority = priority;
+        this.done = done;
+    }
 
+    // Add a new task to tasks.json
+    static async add(title, category, assigned, dueDate, status, priority) {
+        const task = new Task(title, category, assigned, dueDate, status, priority);
+        const tasks = await StorageManager.loadData("tasks");
+        if (!Array.isArray(tasks)) {
+            console.error("Error: tasks data is not an array, forcing to array =>", tasks);
+            // Force it to become an array
+            tasks = tasks ? [tasks] : [];
+        }
+        tasks.push(task);
+        await StorageManager.saveData("tasks", tasks);
+        return task;
+    }
 
+    // Load all tasks as an array
+    static async loadAll() {
+        const tasks = await StorageManager.loadData("tasks");
+        return Array.isArray(tasks) ? tasks : [];
+    }
 
+    // Edit a task in tasks.json
+    static async edit(id, updatedTitle, updatedCategory, updatedAssigned, updatedDueDate, updatedStatus, updatedPriority, updatedDone) {
+        let tasks = await StorageManager.loadData("tasks");
+        tasks = tasks.map(task =>
+            task.id === id
+                ? { ...task, title: updatedTitle, category: updatedCategory, assigned: updatedAssigned, dueDate: updatedDueDate, status: updatedStatus, priority: updatedPriority, done: updatedDone }
+                : task
+        );
+        await StorageManager.saveData("tasks", tasks);
+    }
+}
 
-document.addEventListener("DOMContentLoaded", function () {
-    const categoryList = document.getElementById("categoryList");
-
-    if (!categoryList) {
-        console.error("Error: categoryList element not found");
+/* ====================== TASK INITIALIZATION ====================== */
+async function initializeApp() {
+    // Load tasks array
+    const tasks = await Task.loadAll();
+    if (!Array.isArray(tasks)) {
+        console.error("Error: Tasks data is not an array =>", tasks);
         return;
     }
+    // Classify each task (Today, Upcoming, Done)
+    tasks.forEach(task => classifyTask(task));
+}
 
-    console.log("Category list and tabs initialized successfully");
+// On DOM load, run initializeApp
+document.addEventListener("DOMContentLoaded", initializeApp);
 
-    function updateActiveTab(selectedTab) {
-        console.log("Tab clicked:", selectedTab.textContent);
+/* ====================== CLASSIFY TASKS ====================== */
+function classifyTask(task) {
+    const todayWrapper    = document.getElementById("todayTasks");
+    const upcomingWrapper = document.getElementById("upcomingTasks");
+    const doneWrapper     = document.getElementById("doneTasks");
 
-        // Remove active class from all tabs
-        document.querySelectorAll("#categoryList li").forEach(tab => tab.classList.remove("active"));
-        
-        // Add active class to selected tab
-        selectedTab.classList.add("active");
+    // Create task element
+    const taskElement = document.createElement("div");
+    taskElement.classList.add("task");
+    taskElement.innerHTML = `
+        <input class="task-item" name="task" type="checkbox" id="${task.id}" ${task.done ? 'checked' : ''}>
+        <label for="${task.id}">
+          <span class="label-text">${task.title}</span>
+        </label>
+        <div class="tag progress-wrapper">
+            <div class="tag progress">${task.category}</div>
+            <div class="tag progress">${task.assigned}</div>
+            <div class="tag progress">${task.dueDate || "No due date"}</div>
+            <div class="tag progress">${task.status}</div>
+        </div>
+    `;
 
-        console.log("Active tab updated to:", selectedTab.textContent);
+    // Decide which wrapper to prepend
+    if (task.done) {
+        doneWrapper.prepend(taskElement);
+    } else if (!task.dueDate || new Date(task.dueDate).toDateString() === new Date().toDateString()) {
+        todayWrapper.prepend(taskElement);
+    } else {
+        upcomingWrapper.prepend(taskElement);
+    }
+}
+
+/* ====================== ADD TASK ====================== */
+async function addTask() {
+    const taskCategory = document.getElementById("task-category").value || "No Category";
+    const taskTitle = document.getElementById("task-title").value.trim();
+    const taskAssigned = document.getElementById("task-assigned").value.trim() || "Unassigned";
+    const taskDueDate = document.getElementById("task-due-date").value;
+    const taskStatus = document.getElementById("task-status").value || "In Progress";
+    const taskPriority = "Normal";
+    
+    if (!taskTitle) {
+        alert("Task title is required!");
+        return;
+    }
+    
+    const newTask = await Task.add(taskTitle, taskCategory, taskAssigned, taskDueDate, taskStatus, taskPriority);
+    classifyTask(newTask); // Immediately show in UI
+    closeTaskModal();
+}
+
+/* ====================== EDIT TASK ====================== */
+async function editTask(id) {
+    const updatedTitle = prompt("Edit task title:");
+    if (!updatedTitle) return;
+    
+    let tasks = await Task.loadAll();
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    
+    await Task.edit(
+        id,
+        updatedTitle,
+        task.category,
+        task.assigned,
+        task.dueDate,
+        task.status,
+        task.priority,
+        task.done
+    );
+    
+    // Refresh UI
+    document.getElementById("todayTasks").innerHTML = "";
+    document.getElementById("upcomingTasks").innerHTML = "";
+    document.getElementById("doneTasks").innerHTML = "";
+    initializeApp();
+}
+
+/* ====================== CATEGORY CLASS ====================== */
+class Category {
+    constructor(name) {
+        this.id = `category-${Date.now()}`;
+        this.name = name;
     }
 
-    // Use event delegation to handle clicks on dynamically added tabs
-    categoryList.addEventListener("click", function (event) {
-        if (event.target.tagName === "LI") {
-            updateActiveTab(event.target);
+    static async add(name) {
+        const category = new Category(name);
+        let categories = await StorageManager.loadData("categories");
+        if (!Array.isArray(categories)) {
+            console.error("Error: Categories data is not an array =>", categories);
+            categories = categories ? [categories] : [];
         }
-    });
-});
+        categories.push(category);
+        await StorageManager.saveData("categories", categories);
+        return category;
+    }
 
+    static async loadAll() {
+        let categories = await StorageManager.loadData("categories");
+        return Array.isArray(categories) ? categories : [];
+    }
+}
 
+/* ====================== CATEGORY INITIALIZATION ====================== */
+document.addEventListener("DOMContentLoaded", initializeCategories);
 
+async function initializeCategories() {
+    const categories = await Category.loadAll();
+    if (!Array.isArray(categories)) {
+        console.error("Error: Loaded categories data is not an array =>", categories);
+        return;
+    }
+    categories.forEach(category => addCategoryToUI(category));
+}
 
-function addCategory() {
+/* ====================== ADD CATEGORY ====================== */
+async function addCategory() {
     const categoryName = document.getElementById("category-name").value.trim();
-    const categoryList = document.getElementById("categoryList");
-
-    if (categoryName === "") {
+    if (!categoryName) {
         alert("Please enter a category name!");
         return;
     }
-
-    // Create new category list item
-    const newCategory = document.createElement("li");
-    newCategory.textContent = categoryName;
-    newCategory.setAttribute("data-category", categoryName.toLowerCase());
-    
-    // Append new category to list
-    categoryList.appendChild(newCategory);
-
-    // Clear input field
+    const newCategory = await Category.add(categoryName);
+    addCategoryToUI(newCategory);
     document.getElementById("category-name").value = "";
-
-    // Close modal
     closeCategoryModal();
 }
 
-// Function to open the category modal
-function openCategoryModal() {
-    document.getElementById("categoryModal").style.display = "flex";
-}
-
-function addCategory() {
-    const categoryName = document.getElementById("category-name").value.trim();
+/* ====================== CATEGORY UI ====================== */
+function addCategoryToUI(category) {
     const categoryList = document.getElementById("categoryList");
-
-    if (categoryName === "") {
-        alert("Please enter a category name!");
-        return;
-    }
-
-    // Create new category list item
     const newCategory = document.createElement("li");
-    newCategory.textContent = categoryName;
-    newCategory.setAttribute("data-category", categoryName.toLowerCase());
-    
-    // Append new category to list
+    newCategory.textContent = category.name;
+    newCategory.setAttribute("data-category", category.name.toLowerCase());
     categoryList.appendChild(newCategory);
-
-    // Clear input field
-    document.getElementById("category-name").value = "";
-
-    // Close modal
-    closeCategoryModal();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
