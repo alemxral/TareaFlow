@@ -81,6 +81,10 @@
       
       <!-- ADD CATEGORY & ADD TASK BUTTONS -->
       <div class="label-wrapper add-category-wrapper">
+          <!-- The new 3-dot menu for Category Management -->
+        <span class="category-menu-icon" onclick="openCategoryManagement()">
+          <i class="fa-solid fa-ellipsis-vertical"></i>
+        </span>
         <button class="add-category-btn" onclick="openCategoryModal()">+ Add Category</button>
         <button class="add-task-btn" onclick="openTaskModal()">+ Add Task</button>
       </div>
@@ -121,66 +125,7 @@
         <span class="title">Today Tasks</span>
       </div>
       <div class="tasks-wrapper collapsible-content" id="todayTasks">
-        <!-- TASK ITEM -->
-        <div class="task">
-          <input class="task-item" name="task" type="checkbox" id="item-1" checked>
-          <label for="item-1">
-            <span class="label-text">Dashboard Design Implementation</span>
-          </label>
-          <div class="tag progress-wrapper">
-            <div class="tag progress">In Progress</div>
-            <div class="tag progress">2024</div>
-            <div class="tag progress">Ale</div>
-          </div>
-        </div>
-        <!-- TASK ITEM -->
-        <div class="task">
-          <input class="task-item" name="task" type="checkbox" id="item-2" checked>
-          <label for="item-2">
-            <span class="label-text">Create a Userflow</span>
-          </label>
-          <div class="tag progress-wrapper">
-            <div class="tag progress">In Progress</div>
-            <div class="tag progress">2024</div>
-            <div class="tag progress">Ale</div>
-          </div>
-        </div>
-        <!-- TASK ITEM (Duplicate Example) -->
-        <div class="task">
-          <input class="task-item" name="task" type="checkbox" id="item-3" checked>
-          <label for="item-3">
-            <span class="label-text">Create a Userflow</span>
-          </label>
-          <div class="tag progress-wrapper">
-            <div class="tag progress">In Progress</div>
-            <div class="tag progress">2024</div>
-            <div class="tag progress">Ale</div>
-          </div>
-        </div>
-        <!-- TASK ITEM (Duplicate Example) -->
-        <div class="task">
-          <input class="task-item" name="task" type="checkbox" id="item-4" checked>
-          <label for="item-4">
-            <span class="label-text">Create a Userflow</span>
-          </label>
-          <div class="tag progress-wrapper">
-            <div class="tag progress">In Progress</div>
-            <div class="tag progress">2024</div>
-            <div class="tag progress">Ale</div>
-          </div>
-        </div>
-        <!-- TASK ITEM (Duplicate Example) -->
-        <div class="task">
-          <input class="task-item" name="task" type="checkbox" id="item-5" checked>
-          <label for="item-5">
-            <span class="label-text">Create a Userflow</span>
-          </label>
-          <div class="tag progress-wrapper">
-            <div class="tag progress">In Progress</div>
-            <div class="tag progress">2024</div>
-            <div class="tag progress">Ale</div>
-          </div>
-        </div>
+    
       </div>
       <!-- END COLLAPSIBLE: TODAY TASKS -->
       
@@ -190,29 +135,7 @@
       </div>
       <div class="tasks-wrapper collapsible-content" id="upcomingTasks">
         <!-- TASK ITEM -->
-        <div class="task">
-          <input class="task-item" name="task" type="checkbox" id="item-6" checked>
-          <label for="item-6">
-            <span class="label-text">Dashboard Design Implementation</span>
-          </label>
-          <div class="tag progress-wrapper">
-            <div class="tag progress">In Progress</div>
-            <div class="tag progress">2024</div>
-            <div class="tag progress">Ale</div>
-          </div>
-        </div>
-        <!-- TASK ITEM -->
-        <div class="task">
-          <input class="task-item" name="task" type="checkbox" id="item-7" checked>
-          <label for="item-7">
-            <span class="label-text">Create a Userflow</span>
-          </label>
-          <div class="tag progress-wrapper">
-            <div class="tag progress">In Progress</div>
-            <div class="tag progress">2024</div>
-            <div class="tag progress">Ale</div>
-          </div>
-        </div>
+       
       </div>
       <!-- END COLLAPSIBLE: UPCOMING -->
       
@@ -222,29 +145,7 @@
       </div>
       <div class="tasks-wrapper collapsible-content" id="doneTasks">
         <!-- TASK ITEM -->
-        <div class="task">
-          <input class="task-item" name="task" type="checkbox" id="item-8" checked>
-          <label for="item-8">
-            <span class="label-text">Dashboard Design Implementation</span>
-          </label>
-          <div class="tag progress-wrapper">
-            <div class="tag progress">In Progress</div>
-            <div class="tag progress">2024</div>
-            <div class="tag progress">Ale</div>
-          </div>
-        </div>
-        <!-- TASK ITEM -->
-        <div class="task">
-          <input class="task-item" name="task" type="checkbox" id="item-9" checked>
-          <label for="item-9">
-            <span class="label-text">Create a Userflow</span>
-          </label>
-          <div class="tag progress-wrapper">
-            <div class="tag progress">In Progress</div>
-            <div class="tag progress">2024</div>
-            <div class="tag progress">Ale</div>
-          </div>
-        </div>
+        
       </div>
       <!-- END COLLAPSIBLE: DONE -->
     </div>
@@ -433,6 +334,36 @@
   </div>
 </div>
 <!-- MODAL FOR EDITING/DELETING A TASK -->
+
+<!-- CATEGORY MANAGEMENT MODAL -->
+<div id="categoryManagementModal" class="modal">
+  <div class="modal-content category-modal-content">
+    <span class="close-btn" onclick="closeCategoryManagementModal()">&times;</span>
+    <h2 class="modal-title">Category Management</h2>
+
+    <!-- Display Existing Categories in a grid/card layout -->
+    <div id="categoryListContainer" class="category-grid"></div>
+    <hr />
+
+    <!-- Form to Add or Edit a Category -->
+    <div class="category-form">
+      <label for="edit-category-name">Category Name:</label>
+      <input type="text" id="edit-category-name" class="modal-input" placeholder="Enter category name" />
+
+      <!-- Hidden field if editing an existing category -->
+      <input type="hidden" id="edit-category-id" value="" />
+
+      <div class="modal-btn-row">
+        <button class="save-category-btn" onclick="saveCategory()">Save Category</button>
+        <button class="delete-category-btn" onclick="deleteCategory()">Delete Category</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- CATEGORY MANAGEMENT MODAL -->
+    <!-- ======================================================
+         MODALS END
+    ====================================================== -->
 
   </div>
   <!-- ======================================================

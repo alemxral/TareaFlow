@@ -392,41 +392,204 @@
   /**************************************************************
    ******************** CATEGORY CLASS **************************
    *************************************************************/
-  class Category {
-    constructor(name) {
-      this.id = `category-${Date.now()}`;
-      this.name = name;
-    }
-  
-    static async add(name) {
-      const category = new Category(name);
-      let categories = await StorageManager.loadData("categories");
-      if (!Array.isArray(categories)) {
-        console.error("Error: Categories data is not an array =>", categories);
-        categories = categories ? [categories] : [];
-      }
-      categories.push(category);
-      await StorageManager.saveData("categories", categories);
-      return category;
-    }
-  
-    static async loadAll() {
-      const categories = await StorageManager.loadData("categories");
-      return Array.isArray(categories) ? categories : [];
-    }
+  /* ========== 1) Replace your Category class with this ========== */
+class Category {
+  constructor(name) {
+    this.id = `category-${Date.now()}`;
+    this.name = name;
   }
+
+  static async add(name) {
+    const category = new Category(name);
+    let categories = await StorageManager.loadData("categories");
+    if (!Array.isArray(categories)) {
+      console.error("Error: categories data is not an array =>", categories);
+      categories = categories ? [categories] : [];
+    }
+    categories.push(category);
+    await StorageManager.saveData("categories", categories);
+    return category;
+  }
+
+  static async loadAll() {
+    const categories = await StorageManager.loadData("categories");
+    return Array.isArray(categories) ? categories : [];
+  }
+
+  static async edit(categoryId, newName) {
+    let categories = await StorageManager.loadData("categories");
+    let oldName = "";
+
+    // Rename the category
+    categories = categories.map(c => {
+      if (c.id === categoryId) {
+        oldName = c.name;
+        return { ...c, name: newName };
+      }
+      return c;
+    });
+    await StorageManager.saveData("categories", categories);
+
+    // Also rename references in tasks
+    let tasks = await StorageManager.loadData("tasks");
+    tasks = tasks.map(t => {
+      if (t.category === oldName) {
+        return { ...t, category: newName };
+      }
+      return t;
+    });
+    await StorageManager.saveData("tasks", tasks);
+  }
+
+  static async delete(categoryId) {
+    let categories = await StorageManager.loadData("categories");
+    let oldName = "";
+
+    // Remove from categories
+    categories = categories.filter(c => {
+      if (c.id === categoryId) {
+        oldName = c.name;
+        return false;
+      }
+      return true;
+    });
+    await StorageManager.saveData("categories", categories);
+
+    // Clear tasks referencing oldName
+    let tasks = await StorageManager.loadData("tasks");
+    tasks = tasks.map(t => {
+      if (t.category === oldName) {
+        return { ...t, category: "" };
+      }
+      return t;
+    });
+    await StorageManager.saveData("tasks", tasks);
+  }
+}
+
+/* ========== 2) Add the new 'Category Management' logic ========== */
+let editingCategoryId = null;
+
+/* Called by the 3-dot icon next to "Add Category" */
+function openCategoryManagement() {
+  displayCategories();
+  document.getElementById("edit-category-name").value = "";
+  document.getElementById("edit-category-id").value = "";
+  document.getElementById("categoryManagementModal").style.display = "flex";
+}
+
+function closeCategoryManagementModal() {
+  document.getElementById("categoryManagementModal").style.display = "none";
+  document.getElementById("edit-category-id").value = "";
+}
+
+/* Show categories in a grid, each with an Edit button */
+async function displayCategories() {
+  const catListContainer = document.getElementById("categoryListContainer");
+  catListContainer.innerHTML = "";
+
+  const categories = await Category.loadAll();
+  if (!categories.length) {
+    catListContainer.innerHTML = "<p>No categories found.</p>";
+    return;
+  }
+
+  categories.forEach(c => {
+    const catCard = document.createElement("div");
+    catCard.classList.add("category-card");
+    catCard.innerHTML = `
+      <div class="category-header">
+        <div class="category-name">${c.name}</div>
+        <button class="edit-category-btn" onclick="startEditCategory('${c.id}')">Edit</button>
+      </div>
+    `;
+    catListContainer.appendChild(catCard);
+  });
+}
+
+/* Fill the form fields to edit */
+async function startEditCategory(catId) {
+  editingCategoryId = catId;
+  const categories = await Category.loadAll();
+  const cat = categories.find(c => c.id === catId);
+  if (!cat) return console.error("Category not found =>", catId);
+
+  document.getElementById("edit-category-name").value = cat.name;
+  document.getElementById("edit-category-id").value = catId;
+}
+
+/* Save or Add a new category, then refresh tasks */
+async function saveCategory() {
+  const catNameField = document.getElementById("edit-category-name");
+  const existingId = document.getElementById("edit-category-id").value;
+
+  if (!catNameField.value.trim()) {
+    alert("Category name is required!");
+    return;
+  }
+
+  if (existingId) {
+    // Edit existing category
+    await Category.edit(existingId, catNameField.value.trim());
+  } else {
+    // Add new
+    await Category.add(catNameField.value.trim());
+  }
+
+  // Refresh categories & tasks UI
+  await displayCategories();
+  reloadTasks();
+
+  // Clear form
+  catNameField.value = "";
+  document.getElementById("edit-category-id").value = "";
+}
+
+/* Delete the category & reset tasks that had it */
+async function deleteCategory() {
+  const existingId = document.getElementById("edit-category-id").value;
+  if (!existingId) {
+    alert("No category selected to delete!");
+    return;
+  }
+  if (!confirm("Are you sure you want to delete this category?")) {
+    return;
+  }
+
+  await Category.delete(existingId);
   
+  // Refresh the category management modal list:
+  await displayCategories();
+
+  // IMPORTANT: Also refresh the main category tabs in your nav:
+  await initializeCategories(); // This re-fills <ul id="categoryList">
+  
+  // Optionally reload tasks if you want them re-classified or updated
+  reloadTasks();
+
+  // Clear the form fields
+  document.getElementById("edit-category-name").value = "";
+  document.getElementById("edit-category-id").value = "";
+}
+
+
   /**************************************************************
    ************** CATEGORY INITIALIZATION & UI ******************
    *************************************************************/
-  async function initializeCategories() {
+   async function initializeCategories() {
+    const categoryList = document.getElementById("categoryList");
+    // Clear existing, but keep "All"
+    categoryList.innerHTML = `<li class="active" data-category="all">All</li>`;
+  
     const categories = await Category.loadAll();
     if (!Array.isArray(categories)) {
       console.error("Error: Loaded categories data is not an array =>", categories);
       return;
     }
+  
     categories.forEach(category => addCategoryToUI(category));
   }
+  
   
   async function addCategory() {
     const categoryName = document.getElementById("category-name").value.trim();
@@ -465,6 +628,7 @@
       option.textContent = cat.name;
       categorySelect.appendChild(option);
     });
+    
   }
 
 
@@ -563,6 +727,27 @@
       }
     });
   });
+  
+  function filterTasks(categoryName) {
+    // Convert to lowercase for consistent matching
+    const targetCategory = categoryName.toLowerCase();
+  
+    // Get all task elements
+    const allTasks = document.querySelectorAll(".task");
+  
+    // Loop through each task
+    allTasks.forEach(taskEl => {
+      const taskCat = taskEl.getAttribute("data-category") || "";
+  
+      // Show the task if "all" or if category matches
+      if (targetCategory === "all" || taskCat === targetCategory) {
+        taskEl.style.display = "flex"; 
+      } else {
+        // Otherwise hide
+        taskEl.style.display = "none";
+      }
+    });
+  }
   
   
   /**************************************************************

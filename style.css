@@ -983,3 +983,105 @@ label .label-text:before {
 .delete-user-btn:hover {
   background-color: #cc0000;
 }
+
+.category-menu-icon {
+  margin-left: 8px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+.category-menu-icon:hover {
+  color: #000;
+}
+
+/* Category Management Modal (bigger styling) */
+.category-modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 30px;
+  width: 60%;
+  max-width: 700px;
+  position: relative;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Grid for category listing */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* Each category card */
+.category-card {
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: transform 0.2s ease;
+  position: relative;
+}
+.category-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Category name & edit button row */
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 8px;
+  align-items: center;
+}
+.category-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+.edit-category-btn {
+  background-color: #ccc;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.edit-category-btn:hover {
+  background-color: #bbb;
+}
+
+/* The form for category editing */
+.category-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.save-category-btn {
+  background-color: var(--checkbox-color);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.save-category-btn:hover {
+  background-color: #3ea9a3;
+}
+.delete-category-btn {
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.delete-category-btn:hover {
+  background-color: #cc0000;
+}
