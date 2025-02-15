@@ -94,24 +94,21 @@ class StorageManager {
 
 /* ====================== TASK CLASS ====================== */
 class Task {
-    constructor(title, category, assigned, dueDate, status, priority = "Normal", done = false) {
+    constructor(title, category, assigned, dueDate, priority = "Normal", done = false) {
         this.id = `task-${Date.now()}`;
         this.title = title;
         this.category = category;
         this.assigned = assigned;
         this.dueDate = dueDate;
-        this.status = status;
         this.priority = priority;
-        this.done = done;
+        this.done = done; // Track if task is done
     }
 
-    // Add a new task to tasks.json
-    static async add(title, category, assigned, dueDate, status, priority) {
-        const task = new Task(title, category, assigned, dueDate, status, priority);
-        const tasks = await StorageManager.loadData("tasks");
+    static async add(title, category, assigned, dueDate, priority) {
+        const task = new Task(title, category, assigned, dueDate, priority, false);
+        let tasks = await StorageManager.loadData("tasks");
         if (!Array.isArray(tasks)) {
-            console.error("Error: tasks data is not an array, forcing to array =>", tasks);
-            // Force it to become an array
+            console.error("Error: tasks data is not an array =>", tasks);
             tasks = tasks ? [tasks] : [];
         }
         tasks.push(task);
@@ -119,23 +116,21 @@ class Task {
         return task;
     }
 
-    // Load all tasks as an array
+    // Load all tasks
     static async loadAll() {
-        const tasks = await StorageManager.loadData("tasks");
+        let tasks = await StorageManager.loadData("tasks");
         return Array.isArray(tasks) ? tasks : [];
     }
 
-    // Edit a task in tasks.json
-    static async edit(id, updatedTitle, updatedCategory, updatedAssigned, updatedDueDate, updatedStatus, updatedPriority, updatedDone) {
+    // Toggle done property
+    static async toggleDone(id, isDone) {
         let tasks = await StorageManager.loadData("tasks");
-        tasks = tasks.map(task =>
-            task.id === id
-                ? { ...task, title: updatedTitle, category: updatedCategory, assigned: updatedAssigned, dueDate: updatedDueDate, status: updatedStatus, priority: updatedPriority, done: updatedDone }
-                : task
-        );
+        tasks = tasks.map(t => t.id === id ? { ...t, done: isDone } : t);
         await StorageManager.saveData("tasks", tasks);
     }
 }
+
+
 
 /* ====================== TASK INITIALIZATION ====================== */
 async function initializeApp() {
@@ -152,19 +147,51 @@ async function initializeApp() {
 // On DOM load, run initializeApp
 document.addEventListener("DOMContentLoaded", initializeApp);
 
+
+async function loadTasks() {
+    const taskContainer = document.getElementById("todayTasks");
+    // Clear old tasks
+    taskContainer.innerHTML = "";
+
+    // Load tasks from storage
+    const tasks = await Task.loadAll();
+    tasks.forEach(task => addTaskToUI(task));
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    loadNotes();
+    loadTasks();
+    loadHabits();
+    loadCategories();
+});
+
+
+
+/* ====================== CLASSIFY TASKS ====================== */
 /* ====================== CLASSIFY TASKS ====================== */
 function classifyTask(task) {
+    // The wrappers for Today, Upcoming, Done
     const todayWrapper = document.getElementById("todayTasks");
     const upcomingWrapper = document.getElementById("upcomingTasks");
     const doneWrapper = document.getElementById("doneTasks");
   
+    // Create the .task element
     const taskElement = document.createElement("div");
     taskElement.classList.add("task");
-    // Store the category as a data attribute
     taskElement.setAttribute("data-category", task.category.toLowerCase());
-    
+  
+    // Compute daysLeft locally (not stored in JSON)
+    const daysLeft = calculateDaysLeft(task.dueDate);
+  
+    // Build the inner HTML, ignoring task.status
     taskElement.innerHTML = `
-      <input class="task-item" name="task" type="checkbox" id="${task.id}" ${task.done ? "checked" : ""}>
+      <input
+        class="task-item"
+        name="task"
+        type="checkbox"
+        id="${task.id}"
+        ${task.done ? "checked" : ""}
+      >
       <label for="${task.id}">
         <span class="label-text">${task.title}</span>
       </label>
@@ -172,10 +199,11 @@ function classifyTask(task) {
         <div class="tag progress">${task.category}</div>
         <div class="tag progress">${task.assigned}</div>
         <div class="tag progress">${task.dueDate || "No due date"}</div>
-        <div class="tag progress">${task.status}</div>
+        <div class="tag progress">${daysLeft}</div>
       </div>
     `;
   
+    // Place the task in the correct wrapper
     if (task.done) {
       doneWrapper.prepend(taskElement);
     } else if (!task.dueDate || new Date(task.dueDate).toDateString() === new Date().toDateString()) {
@@ -183,27 +211,97 @@ function classifyTask(task) {
     } else {
       upcomingWrapper.prepend(taskElement);
     }
-  }
   
+    // Attach an event listener to toggle `task.done`
+    const checkbox = taskElement.querySelector(".task-item");
+    checkbox.addEventListener("change", async () => {
+      const isChecked = checkbox.checked;
+  
+      // 1) Update in storage
+      await Task.toggleDone(task.id, isChecked);
+  
+      // 2) Remove from current wrapper
+      taskElement.remove();
+  
+      // 3) Re-classify so it goes to the correct wrapper
+      task.done = isChecked;
+      classifyTask(task);
+    });
+  }
+
+  function calculateDaysLeft(dueDate) {
+    if (!dueDate) return "No due date";
+    const today = new Date();
+    const due = new Date(dueDate);
+    const diffTime = due - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 ? `${diffDays} days left` : "Overdue";
+  }
+
 
 /* ====================== ADD TASK ====================== */
 async function addTask() {
-    const taskCategory = document.getElementById("task-category").value || "No Category";
+    // Gather inputs
     const taskTitle = document.getElementById("task-title").value.trim();
+    const taskCategory = document.getElementById("task-category").value;
     const taskAssigned = document.getElementById("task-assigned").value.trim() || "Unassigned";
     const taskDueDate = document.getElementById("task-due-date").value;
-    const taskStatus = document.getElementById("task-status").value || "In Progress";
-    const taskPriority = "Normal";
-    
+    const taskPriority = "Normal"; // or from a dropdown if you have one
+  
     if (!taskTitle) {
-        alert("Task title is required!");
-        return;
+      alert("Task title is required!");
+      return;
     }
+  
+    // 1) Create & save new task to JSON
+    const newTask = await Task.add(taskTitle, taskCategory, taskAssigned, taskDueDate, taskPriority);
     
-    const newTask = await Task.add(taskTitle, taskCategory, taskAssigned, taskDueDate, taskStatus, taskPriority);
-    classifyTask(newTask); // Immediately show in UI
+    // 2) Immediately classify it in the UI
+    classifyTask(newTask);
+  
+    // 3) Close the modal and clear input fields
     closeTaskModal();
+  }
+  
+function addTaskToUI(task) {
+    const taskContainer = document.getElementById("todayTasks");
+    
+    // Compute days left
+    const daysLeft = calculateDaysLeft(task.dueDate);
+
+    // Build HTML
+    const taskElement = document.createElement("div");
+    taskElement.classList.add("task");
+    taskElement.innerHTML = `
+        <input
+            class="task-item"
+            type="checkbox"
+            id="${task.id}"
+            ${task.done ? "checked" : ""}
+        >
+        <label for="${task.id}">
+            <span class="label-text">${task.title}</span>
+        </label>
+        <div class="tag progress-wrapper">
+            <div class="tag progress">${task.category}</div>
+            <div class="tag progress">${task.assigned}</div>
+            <div class="tag progress">${task.dueDate || "No due date"}</div>
+            <div class="tag progress">${daysLeft}</div>
+        </div>
+    `;
+
+    // Append to container
+    taskContainer.prepend(taskElement);
+
+    // Attach an event listener to toggle done
+    const checkbox = taskElement.querySelector(".task-item");
+    checkbox.addEventListener("change", async () => {
+        const isChecked = checkbox.checked;
+        await Task.toggleDone(task.id, isChecked);
+    });
 }
+
+
 
 /* ====================== EDIT TASK ====================== */
 async function editTask(id) {
