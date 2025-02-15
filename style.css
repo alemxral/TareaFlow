@@ -340,14 +340,20 @@ button {
 /* ======================================================
    TASKS, TASK ITEMS & TAGS
 ===================================================== */
+/* ======================================================
+   TASKS, TASK ITEMS & TAGS
+===================================================== */
+
+/* Wrapper for tasks */
 .tasks-wrapper {
   display: flex;
   flex-direction: column;
-  
   gap: 16px;
   padding: 15px 20px;
   overflow-y: visible;
 }
+
+/* Individual task row */
 .task {
   display: flex;
   align-items: center;
@@ -361,37 +367,55 @@ button {
 .task:last-child {
   border-bottom: none;
 }
+
+/* Label containing our custom checkbox & text */
 .task label {
   display: flex;
   align-items: center;
-  flex: 1;
+  gap: 8px; /* spacing between checkbox and text */
   cursor: pointer;
+  position: relative;
 }
+
+/* Hide the native checkbox */
+.task-item {
+  display: none; /* We'll replace it with a custom box */
+}
+
+/* The text next to our custom checkbox */
 .label-text {
   display: inline-block;
   margin-top: 3px;
-  margin-left: 10px;
-  position: relative;
+  position: relative; 
+  /* no extra left margin, ensuring no shift on wrap */
 }
+
+/* The custom checkbox box */
 label .label-text:before {
   content: '';
-  position: absolute;
-  left: -24px;
+  display: inline-block; /* ensures the box flows with text */
   width: 14px;
   height: 14px;
   border: 1px solid #ddd;
   border-radius: 2px;
   transition: 0.2s ease;
+  margin-right: 6px; /* space between the box and label text */
+  vertical-align: middle; /* keeps the checkbox aligned with the text */
 }
+
+/* When the .task-item is checked, apply custom checkmark styling */
 .task-item:checked + label .label-text:before {
   background-color: var(--checkbox-color);
-  border: none;
+  border: 1px solid var(--checkbox-color);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-size: 10px;
   background-position: center;
-  border: 1px solid var(--checkbox-color);
 }
+
+
+
+
 
 /* ======================================================
    TAGS & TAG WRAPPER
