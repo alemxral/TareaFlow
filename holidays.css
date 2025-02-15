@@ -1,0 +1,225 @@
+/**************************************************************
+ * MULTI-YEAR CALENDAR (2024 - 2027) WITH USERS
+ **************************************************************/
+
+ .multi-year-calendar {
+	width: 100%;
+	margin: 20px auto;
+	padding: 20px;
+	background: #f5f8ff;
+	border-radius: 8px;
+	box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  
+  /* Navigation bar */
+  .calendar-nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
+  }
+  .calendar-nav h2 {
+	font-size: 1.3rem;
+	font-weight: 700;
+	margin: 0 10px;
+	text-align: center;
+  }
+  .cal-nav-btn {
+	background: #004b8f;
+	color: #fff;
+	border: none;
+	padding: 6px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background 0.3s ease;
+  }
+  .cal-nav-btn:hover {
+	background: #0055a4;
+  }
+  
+  /* Main area: left calendar + right panel */
+  .calendar-main {
+	display: flex;
+	gap: 20px;
+  }
+  
+  /* Calendar Grid */
+  .calendar-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 8px;
+	flex: 1;
+  }
+  .day-name {
+	text-align: center;
+	background: #004b8f;
+	color: #fff;
+	padding: 10px;
+	border-radius: 4px;
+	font-weight: 600;
+	font-size: 0.9rem;
+  }
+  .day-cell {
+	min-height: 80px;
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	position: relative;
+	cursor: pointer;
+	transition: background 0.2s ease;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	padding: 6px;
+  }
+  .day-cell:hover {
+	background: #eaf4ff;
+  }
+  .day-cell.today {
+	outline: 2px solid #4cc9f0;
+  }
+  .day-cell.selected {
+	outline: 2px dashed #ffbb00;
+	background: #fffbe8;
+  }
+  .day-number {
+	font-size: 0.95rem;
+	font-weight: 700;
+	margin-bottom: 4px;
+  }
+  .day-holiday-users {
+	margin-top: auto;
+	display: flex;
+	gap: 3px;
+  }
+  .user-circle {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+  }
+  
+  /* Right Panel for holiday info */
+  .calendar-right-panel {
+	width: 350px; /* made bigger to accommodate content */
+	background: #ffffff;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	padding: 10px;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .calendar-right-panel h3 {
+	margin-bottom: 8px;
+	font-size: 1rem;
+	font-weight: 600;
+  }
+  .holiday-list {
+	max-height: 420px;
+	overflow-y: auto;
+	padding: 5px;
+	border: 1px solid #eee;
+	border-radius: 4px;
+	margin-bottom: 10px;
+  }
+  /* Single holiday item in the list */
+  .holiday-item {
+	border-radius: 6px;
+	margin: 8px 0;
+	padding: 10px;
+	color: #fff; /* text in white, background in user color */
+	font-size: 0.9rem;
+	cursor: pointer;
+  }
+  .holiday-item:hover {
+	opacity: 0.9;
+  }
+  
+  .add-holiday-btn {
+	width: 100%;
+	background: #ff8b00;
+	color: #fff;
+	padding: 8px;
+	border-radius: 4px;
+	border: none;
+	cursor: pointer;
+	transition: background 0.3s ease;
+  }
+  .add-holiday-btn:hover {
+	background: #ffa03c;
+  }
+  
+  /**************************************************************
+   * HOLIDAY MODAL
+   **************************************************************/
+  .holiday-modal {
+	display: none;
+	position: fixed;
+	top: 0; left: 0; right: 0; bottom: 0;
+	background: rgba(0,0,0,0.4);
+	justify-content: center;
+	align-items: center;
+	z-index: 999;
+  }
+  .holiday-modal.active {
+	display: flex;
+  }
+  .holiday-modal-content {
+	background: #fff;
+	padding: 20px;
+	width: 340px;
+	border-radius: 6px;
+  }
+  .holiday-modal-content h2 {
+	margin-bottom: 10px;
+	font-size: 1rem;
+	font-weight: 600;
+  }
+  .holiday-modal-content label {
+	display: block;
+	margin: 10px 0 4px;
+	font-size: 0.9rem;
+	font-weight: 500;
+  }
+  .user-select,
+  .holiday-modal-content input[type="text"] {
+	width: 100%;
+	padding: 8px;
+	margin-bottom: 10px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 0.85rem;
+  }
+  .modal-btn-row {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+  }
+  .modal-btn {
+	background: #004b8f;
+	color: #fff;
+	border: none;
+	padding: 6px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background 0.3s ease;
+  }
+  .modal-btn:hover {
+	background: #0055a4;
+  }
+  
+  /**************************************************************
+   * RESPONSIVE ADJUSTMENTS
+   **************************************************************/
+  @media (max-width: 900px) {
+	.calendar-main {
+	  flex-direction: column;
+	}
+	.calendar-right-panel {
+	  width: 100%;
+	  margin-top: 20px;
+	}
+	.day-cell {
+	  min-height: 60px;
+	}
+  }
+  
