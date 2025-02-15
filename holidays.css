@@ -2,11 +2,26 @@
  * MULTI-YEAR CALENDAR (2024 - 2027) WITH USERS
  **************************************************************/
 
+
+ :root {
+	--primary-color: #009e90;
+	--secondary-color: #005f56;
+	--background-light: #f5f8ff;
+	--background-dark: #323e48;
+	--text-light: #ffffff;
+	--text-dark: #1a1a1a;
+	--border-color: #ddd;
+	--hover-light: #dff3f1;
+	--selected-bg: #fffbe8;
+  }
+
+
+
  .multi-year-calendar {
 	width: 100%;
 	margin: 20px auto;
 	padding: 20px;
-	background: #f5f8ff;
+	background: var(--background-light);
 	border-radius: 8px;
 	box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
@@ -25,7 +40,7 @@
 	text-align: center;
   }
   .cal-nav-btn {
-	background: #004b8f;
+	background:  var(--primary-color);
 	color: #fff;
 	border: none;
 	padding: 6px 12px;
@@ -34,7 +49,7 @@
 	transition: background 0.3s ease;
   }
   .cal-nav-btn:hover {
-	background: #0055a4;
+	background: var(--secondary-color);
   }
   
   /* Main area: left calendar + right panel */
@@ -52,7 +67,7 @@
   }
   .day-name {
 	text-align: center;
-	background: #004b8f;
+	background: var(--primary-color);
 	color: #fff;
 	padding: 10px;
 	border-radius: 4px;
@@ -74,13 +89,13 @@
 	padding: 6px;
   }
   .day-cell:hover {
-	background: #eaf4ff;
+	background: var(--hover-light);
   }
   .day-cell.today {
-	outline: 2px solid #4cc9f0;
+	outline: 2px solid var(--primary-color);
   }
   .day-cell.selected {
-	outline: 2px dashed #ffbb00;
+	outline: 2px dashed #009e90;
 	background: #fffbe8;
   }
   .day-number {
@@ -136,7 +151,7 @@
   
   .add-holiday-btn {
 	width: 100%;
-	background: #ff8b00;
+	background: #009e90;
 	color: #fff;
 	padding: 8px;
 	border-radius: 4px;
@@ -145,7 +160,7 @@
 	transition: background 0.3s ease;
   }
   .add-holiday-btn:hover {
-	background: #ffa03c;
+	background: #49beb7;
   }
   
   /**************************************************************
@@ -195,7 +210,7 @@
 	gap: 10px;
   }
   .modal-btn {
-	background: #004b8f;
+	background: var(--primary-color);
 	color: #fff;
 	border: none;
 	padding: 6px 12px;
@@ -204,8 +219,53 @@
 	transition: background 0.3s ease;
   }
   .modal-btn:hover {
-	background: #0055a4;
+	background: var(--secondary-color);
   }
+
+
+/* ========== HOLIDAY LIST ========== */
+.holiday-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px; /* Adds spacing between items */
+	padding: 10px;
+  }
+  
+  .holiday-item {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 12px 16px;
+	border-radius: 8px;
+	background-color: var(--holiday-bg, #444);
+	color: white;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	cursor: pointer;
+  }
+  
+  .holiday-item:hover {
+	transform: scale(1.02);
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* ========== TEXT STYLING ========== */
+  .holiday-item-title {
+	font-size: 16px;
+	font-weight: bold;
+  }
+  
+  .holiday-item-user {
+	font-size: 14px;
+	font-weight: 500;
+  }
+  
+  .holiday-item-date {
+	font-size: 13px;
+	font-style: italic;
+	opacity: 0.8;
+  }
+  
+  
   
   /**************************************************************
    * RESPONSIVE ADJUSTMENTS

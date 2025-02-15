@@ -449,29 +449,47 @@ class User {
   /************************
    * Holiday List in Right Panel
    ************************/
-  function updateHolidayList(){
+  function updateHolidayList() {
     holidayListEl.innerHTML = "";
+  
     if (allHolidays.length === 0) {
       holidayListEl.innerHTML = "<p>No holidays found.</p>";
       return;
     }
+  
     allHolidays.forEach(h => {
       const item = document.createElement("div");
       item.classList.add("holiday-item");
   
-      // find user color
+      // Find user info
       const userObj = allUsers.find(u => u.id === h.userId);
       const color = userObj ? userObj.color : "#444";
   
-      // entire item has user color background
-      item.style.backgroundColor = color;
-      item.style.color = "#fff";
-      item.textContent = `${h.holidayName} - ${userObj ? userObj.name : "Unknown"} (${h.dates.size} days)`;
+      // Extract date range (if available)
+      const holidayDates = [...h.dates].sort();
+      const dateRange =
+        holidayDates.length > 0
+          ? `${holidayDates[0]} → ${holidayDates[holidayDates.length - 1]}`
+          : "No dates selected";
   
+      // Apply background color dynamically
+      item.style.setProperty("--holiday-bg", color);
+  
+      // Build HTML structure
+      item.innerHTML = `
+        <div class="holiday-item-title">${h.holidayName}</div>
+        <div class="holiday-item-user">${userObj ? userObj.name : "Unknown"} (${h.dates.size} days)</div>
+        <div class="holiday-item-date">${dateRange}</div>
+      `;
+  
+      // Click to edit/delete
       item.addEventListener("click", () => openHolidayModal(h.id));
+  
       holidayListEl.appendChild(item);
     });
   }
+  
+  
   
   /************************
    * Navigation (2024-2027)
