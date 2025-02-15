@@ -352,39 +352,50 @@ class User {
     return `${year}-${mm}-${dd}`;
   }
   
-  /************************
-   * Holiday Modal
-   ************************/
-  function openHolidayModal(holidayId=null){
-    if (!holidayId) {
-      // Add new holiday
-      if (selectedDates.size === 0) {
-        alert("Select at least one date first!");
-        return;
-      }
-      editingHolidayId = null;
-      holidayModalTitle.textContent = "Add Holiday for Selected Dates";
-      saveHolidayBtn.textContent = "Save";
-      deleteHolidayBtn.style.display = "none";
-      holidayUserSelect.selectedIndex = 0;
-      holidayNameInput.value = "";
-    } else {
-      // Edit an existing holiday
-      editingHolidayId = holidayId;
-      holidayModalTitle.textContent = "Edit or Remove Holiday";
-      saveHolidayBtn.textContent = "Update";
-      deleteHolidayBtn.style.display = "inline-block";
-  
-      const hol = allHolidays.find(h => h.id === holidayId);
-      if (!hol) {
-        console.warn("Holiday not found for editing:", holidayId);
-        return;
-      }
-      holidayUserSelect.value = hol.userId;
-      holidayNameInput.value = hol.holidayName;
+/************************
+ * Holiday Modal
+ ************************/
+function openHolidayModal(holidayId = null) {
+  if (!holidayId) {
+    // No ID provided → Create new holiday
+    if (selectedDates.size === 0) {
+      alert("Select at least one date first!");
+      return;
     }
-    holidayModal.classList.add("active");
+    
+    // Open modal in creation mode
+    editingHolidayId = null;
+    holidayModalTitle.textContent = "Add Holiday for Selected Dates";
+    saveHolidayBtn.textContent = "Save";
+    deleteHolidayBtn.style.display = "none";
+    holidayUserSelect.selectedIndex = 0;
+    holidayNameInput.value = "";
+  } else {
+    // ID provided → Try to edit existing holiday
+    editingHolidayId = holidayId;
+    holidayModalTitle.textContent = "Edit or Remove Holiday";
+    saveHolidayBtn.textContent = "Update";
+    deleteHolidayBtn.style.display = "inline-block";
+
+    const hol = allHolidays.find(h => h.id === holidayId);
+
+    if (!hol) {
+      console.warn("Holiday not found for editing:", holidayId);
+      
+      // If no holiday found, open the modal in creation mode instead
+      openHolidayModal(); 
+      return;
+    }
+
+    // Load existing holiday data
+    holidayUserSelect.value = hol.userId;
+    holidayNameInput.value = hol.holidayName;
   }
+  
+  // Open the modal
+  holidayModal.classList.add("active");
+}
+
   
   function closeHolidayModal(){
     holidayModal.classList.remove("active");
