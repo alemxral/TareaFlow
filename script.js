@@ -187,20 +187,25 @@
   async function addTask() {
     const taskTitle = document.getElementById("task-title").value.trim();
     const taskCategory = document.getElementById("task-category").value;
-    const taskAssigned = document.getElementById("task-assigned").value.trim() || "";
+    // Now read the assignee from the dropdown only
+    const taskAssigned = document.getElementById("task-assigned-select").value.trim();
     const taskDueDate = document.getElementById("task-due-date").value;
-    const taskPriority = "Normal"; // or from a dropdown
+    const taskPriority = "Normal";
   
     if (!taskTitle) {
       alert("Task title is required!");
       return;
     }
   
+    // Create & store the new task
     const newTask = await Task.add(taskTitle, taskCategory, taskAssigned, taskDueDate, taskPriority);
     classifyTask(newTask);
   
     closeTaskModal();
   }
+  
+  
+  
   
   // Calculate days left
   function calculateDaysLeft(dueDate) {
@@ -211,6 +216,9 @@
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays >= 0 ? `${diffDays} days left` : "Overdue";
   }
+
+
+  
   
   // Classify tasks (Today, Upcoming, Done)
   function classifyTask(task) {
