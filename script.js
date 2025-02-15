@@ -908,24 +908,34 @@ async function deleteCategory() {
   /**************************************************************
    ************** INITIALIZE EVERYTHING ONCE ********************
    *************************************************************/
-  async function initializeAll() {
-    // 1) Tasks
-    const tasks = await Task.loadAll();
-    tasks.forEach(task => classifyTask(task));
-  
-    // 2) Notes
-    await initializeNotes();
-  
-    // 3) Habits - if you have them
-    // loadHabits();
-  
-    // 4) Categories
-    await initializeCategories();
-  
-    // 5) User count
-    await updateUserCount();
-  }
-  
+   async function initializeAll() {
+    try {
+        // ✅ Show preloader before data loads
+        document.getElementById("preloader").style.display = "flex";
+
+        // ✅ Load all data asynchronously
+        const [tasks, categories] = await Promise.all([
+            Task.loadAll(),
+            initializeCategories()
+        ]);
+
+        // ✅ Classify tasks into sections
+        tasks.forEach(task => classifyTask(task));
+
+        // ✅ Initialize Notes
+        await initializeNotes();
+
+        // ✅ Update user count
+        await updateUserCount();
+
+    } catch (err) {
+        console.error("Initialization error:", err);
+    } finally {
+        // ✅ Hide preloader after everything is loaded
+        document.getElementById("preloader").style.display = "none";
+    }
+}
+
   // Called once DOM is fully ready
   document.addEventListener("DOMContentLoaded", initializeAll);
   

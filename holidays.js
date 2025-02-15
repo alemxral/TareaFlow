@@ -201,37 +201,46 @@ class User {
    ************************/
   async function initMultiYearCalendar() {
     try {
-        // Load users and holidays
+        // ✅ Show preloader before fetching data
+        document.getElementById("preloader").style.display = "flex";
+
+        // ✅ Load users and holidays from storage
         const [users, holidays] = await Promise.all([
-          User.loadAll(),
-          Holiday.loadAll()
+            User.loadAll(),
+            Holiday.loadAll()
         ]);
-    
+
+        // ✅ Store users and holidays globally
         allUsers = users;
         allHolidays = holidays.map(h => ({
-          ...h,
-          dates: new Set(h.dates) // Ensure Set
+            ...h,
+            dates: new Set(h.dates || []) // Ensure valid date structure
         }));
-    
-        // Build UI
+
+        // ✅ Build UI elements
         populateUserSelect();
         buildCalendar(currentYear, currentMonth);
         updateHolidayList();
-      } catch (err) {
+
+    } catch (err) {
         console.error("Init error:", err);
-      }
-  
-    // set up events
-    openHolidayModalBtn.addEventListener("click", () => openHolidayModal());
+    } finally {
+        // ✅ Hide preloader after everything is loaded
+        document.getElementById("preloader").style.display = "none";
+    }
+
+    // ✅ Set up event listeners for UI interactions
+    openHolidayModalBtn.addEventListener("click", openHolidayModal);
     cancelHolidayBtn.addEventListener("click", closeHolidayModal);
     saveHolidayBtn.addEventListener("click", saveHoliday);
     deleteHolidayBtn.addEventListener("click", removeHoliday);
-  
+
     prevMonthBtn.addEventListener("click", prevMonth);
     nextMonthBtn.addEventListener("click", nextMonth);
     prevYearBtn.addEventListener("click", prevYear);
     nextYearBtn.addEventListener("click", nextYear);
-  }
+}
+
 
 
 
