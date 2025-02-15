@@ -207,9 +207,14 @@ document.addEventListener("DOMContentLoaded", function () {
     loadTasks();
     loadHabits();
     loadCategories();
+    
 });
 
-
+document.addEventListener("DOMContentLoaded", async () => {
+    // Possibly other initializations (like load tasks, etc.)
+    await updateUserCount();
+  });
+  
 
 /* ====================== CLASSIFY TASKS ====================== */
 /* ====================== CLASSIFY TASKS ====================== */
@@ -870,3 +875,171 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error initializing collapsibles:", error);
     }
 });
+
+
+class User {
+    constructor(name, color) {
+      this.id = `user-${Date.now()}`;
+      this.name = name;
+      this.color = color; // We'll store a user-specific color
+    }
+  
+    static async loadAll() {
+      // Load from storage (like localStorage or your custom StorageManager)
+      const users = await StorageManager.loadData("users");
+      return Array.isArray(users) ? users : [];
+    }
+  
+    static async saveAll(users) {
+      await StorageManager.saveData("users", users);
+    }
+  
+    // Create & store user
+    static async add(name, color) {
+      const newUser = new User(name, color);
+      const users = await User.loadAll();
+      users.push(newUser);
+      await User.saveAll(users);
+      return newUser;
+    }
+  
+    // Edit existing
+    static async edit(userId, newName, newColor) {
+      let users = await User.loadAll();
+      users = users.map(u =>
+        u.id === userId ? { ...u, name: newName, color: newColor } : u
+      );
+      await User.saveAll(users);
+    }
+  
+    // Delete
+    static async delete(userId) {
+      let users = await User.loadAll();
+      users = users.filter(u => u.id !== userId);
+      await User.saveAll(users);
+    }
+  }
+  
+
+  let editingUserId = null;
+
+async function openUserModal() {
+  // Load & display existing users
+  await displayUsers();
+  // Clear the form
+  document.getElementById("user-name").value = "";
+  document.getElementById("user-color").value = "#ff0000";
+  document.getElementById("edit-user-id").value = "";
+  editingUserId = null;
+
+  // Show the modal
+  document.getElementById("userModal").style.display = "flex";
+}
+
+function closeUserModal() {
+  document.getElementById("userModal").style.display = "none";
+  editingUserId = null;
+}
+
+
+async function displayUsers() {
+    const userListContainer = document.getElementById("userListContainer");
+    userListContainer.innerHTML = ""; // Clear existing
+  
+    const users = await User.loadAll();
+    document.getElementById("userCount").textContent = users.length; // if needed for top-part
+  
+    if (users.length === 0) {
+      userListContainer.innerHTML = "<p>No users found.</p>";
+      return;
+    }
+  
+    users.forEach(u => {
+      const userCard = document.createElement("div");
+      userCard.classList.add("user-card");
+  
+      userCard.innerHTML = `
+        <div class="user-header">
+          <div class="user-color-bullet" style="background-color: ${u.color};"></div>
+          <div class="user-name">${u.name}</div>
+        </div>
+        <button class="edit-user-btn" onclick="startEditUser('${u.id}')">Edit</button>
+      `;
+      
+      userListContainer.appendChild(userCard);
+    });
+  }
+  
+  
+
+  async function startEditUser(userId) {
+    editingUserId = userId;
+    const users = await User.loadAll();
+    const user = users.find(u => u.id === userId);
+    if (!user) return console.error("User not found =>", userId);
+  
+    // Fill the form fields
+    document.getElementById("user-name").value = user.name;
+    document.getElementById("user-color").value = user.color;
+    document.getElementById("edit-user-id").value = userId;
+  }
+  
+
+  async function saveUser() {
+    const userName = document.getElementById("user-name").value.trim();
+    const userColor = document.getElementById("user-color").value.trim();
+    const existingId = document.getElementById("edit-user-id").value;
+  
+    if (!userName) {
+      alert("User name is required!");
+      return;
+    }
+  
+    if (existingId) {
+      // Editing
+      await User.edit(existingId, userName, userColor);
+    } else {
+      // Creating
+      await User.add(userName, userColor);
+    }
+  
+    // Refresh UI
+    await displayUsers();
+  
+    // Clear form
+    document.getElementById("user-name").value = "";
+    document.getElementById("user-color").value = "#ff0000";
+    document.getElementById("edit-user-id").value = "";
+    editingUserId = null;
+  }
+  
+
+  async function deleteUser() {
+    const existingId = document.getElementById("edit-user-id").value;
+    if (!existingId) {
+      alert("No user selected to delete!");
+      return;
+    }
+  
+    if (!confirm("Are you sure you want to delete this user?")) {
+      return;
+    }
+  
+    await User.delete(existingId);
+  
+    // Refresh UI
+    await displayUsers();
+  
+    // Clear form
+    document.getElementById("user-name").value = "";
+    document.getElementById("user-color").value = "#ff0000";
+    document.getElementById("edit-user-id").value = "";
+    editingUserId = null;
+  }
+  
+
+  async function updateUserCount() {
+    const users = await User.loadAll();
+    document.getElementById("userCount").textContent = users.length;
+  }
+  

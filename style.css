@@ -218,6 +218,7 @@ button {
   height: 14px;
   margin-right: 14px;
   color: var(--main-color);
+  cursor: pointer;
 }
 .top-part .count {
   font-size: 12px;
@@ -227,6 +228,7 @@ button {
   background-color: #623ce8;
   color: #fff;
   justify-content: center;
+  cursor: pointer;
 }
 .right-content {
   padding: 10px 40px;
@@ -821,3 +823,163 @@ label .label-text:before {
 }
 
 
+
+/* Remove bullet points, reset padding/margins */
+.left-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Each list item */
+.left-content li.item {
+  margin-bottom: 14px;
+  font-weight: 500;
+  display: flex;       /* So items (icon + text) can be aligned */
+  align-items: center;
+}
+
+/* Each link in the list item */
+.left-content li.item a {
+  display: flex;       /* To align icon and text horizontally */
+  align-items: center;
+  gap: 6px;            /* Space between icon and text */
+  color: var(--text-color);
+  text-decoration: none; /* Remove underline */
+  transition: color 0.2s ease;
+}
+
+/* Hover effect on the link */
+.left-content li.item a:hover {
+  color: #000;         /* Slightly darker on hover */
+}
+
+/* Font Awesome icon adjustments (if needed) */
+.left-content li.item a i {
+  font-size: 12x;    /* Adjust icon size */
+  color: inherit;     /* Make icon color match text */
+}
+
+/* Make the user modal bigger and more stylish */
+.user-modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 30px;
+  width: 70%;             /* Bigger width */
+  max-width: 800px;       /* More spacious max width */
+  position: relative;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Title styling for clarity */
+.modal-title {
+  font-size: 24px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Grid layout for users listing */
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* Each user card */
+.user-card {
+  background-color: #fafafa;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: transform 0.2s ease;
+  position: relative;
+}
+
+.user-card:hover {
+  transform: translateY(-2px);
+}
+
+/* User name with color preview bullet */
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+.user-color-bullet {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+}
+
+/* The 'Edit' button inside the card */
+.edit-user-btn {
+  align-self: flex-end;
+  background-color: #ccc;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.edit-user-btn:hover {
+  background-color: #bbb;
+}
+
+/* The user form improvements */
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.user-form label {
+  font-weight: 500;
+  margin-top: 4px;
+}
+.modal-input {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Buttons for save/delete row */
+.modal-btn-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.save-user-btn {
+  background-color: var(--checkbox-color);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.save-user-btn:hover {
+  background-color: #3ea9a3;
+}
+.delete-user-btn {
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.delete-user-btn:hover {
+  background-color: #cc0000;
+}

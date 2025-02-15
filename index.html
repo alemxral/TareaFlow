@@ -44,20 +44,27 @@
       <!-- LEFT CONTENT -->
       <div class="left-content">
        
-          <ul>
-            <li class="item">
+        <ul>
+          <li class="item">
+            <a href="index.html">
               <i class="fa-solid fa-tasks"></i>
               <span>Tasks</span>
-            </li>
-            <li class="item">
+            </a>
+          </li>
+          <li class="item">
+            <a href="holidays.html">
               <i class="fa-solid fa-umbrella-beach"></i>
               <span>Holidays</span>
-            </li>
-            <li class="item">
+            </a>
+          </li>
+          <li class="item">
+            <a href="admin.html">
               <i class="fa-solid fa-user-gear"></i>
-              <span>Administration</span>
-            </li>
-          </ul>
+              <span>Admin</span>
+            </a>
+          </li>
+        </ul>
+        
        
         
       </div>
@@ -248,17 +255,58 @@
     ====================================================== -->
     <div class="right-bar">
       <!-- RIGHT BAR TOP SECTION -->
-      <div class="top-part">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             class="feather feather-users">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
-        <div class="count">6</div>
+<!-- TOP PART SHOWING USERS ICON & COUNT -->
+<div class="top-part" onclick="openUserModal()">
+  <svg xmlns="http://www.w3.org/2000/svg"
+       width="24" height="24"
+       viewBox="0 0 24 24"
+       fill="none"
+       stroke="currentColor"
+       stroke-width="2"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="feather feather-users">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+  <!-- Display how many users there are -->
+  <div class="count" id="userCount">0</div>
+</div>
+
+<!-- MODAL FOR USER MANAGEMENT (ADD/EDIT/DELETE) -->
+<!-- MODAL FOR USER MANAGEMENT (ADD/EDIT/DELETE) -->
+<div id="userModal" class="modal">
+  <div class="modal-content user-modal-content">
+    <span class="close-btn" onclick="closeUserModal()">&times;</span>
+    <h2 class="modal-title">User Management</h2>
+
+    <!-- Display Existing Users in a grid/card layout -->
+    <div id="userListContainer" class="user-grid"></div>
+
+    <hr />
+
+    <!-- Form to Add or Edit a User -->
+    <div class="user-form">
+      <label for="user-name">Name:</label>
+      <input type="text" id="user-name" class="modal-input" placeholder="Enter user name" />
+
+      <label for="user-color">Color:</label>
+      <input type="color" id="user-color" class="modal-input" value="#ff0000" />
+
+      <!-- Hidden field if editing an existing user -->
+      <input type="hidden" id="edit-user-id" value="" />
+
+      <div class="modal-btn-row">
+        <button class="save-user-btn" onclick="saveUser()">Save User</button>
+        <button class="delete-user-btn" onclick="deleteUser()">Delete User</button>
       </div>
+    </div>
+  </div>
+</div>
+
+
       <!-- RIGHT BAR HEADER -->
       <div class="header">Notes</div>
       <!-- NOTE BUTTON WRAPPER -->
@@ -303,7 +351,7 @@
         <!-- Assigned User (Editable Select Dropdown) -->
         <label for="task-assigned">Assigned To (Optional):</label>
         <div class="custom-select">
-          <input type="text" id="task-assigned" class="modal-input assigned-input" placeholder="Enter or select a name">
+         
           <select id="task-assigned-select" class="modal-input">
             <option value="">Select Assignee</option>
             <!-- Future assigned names will be added here dynamically -->
