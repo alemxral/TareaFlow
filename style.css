@@ -36,6 +36,18 @@
   --text-color: #5d606b;
   --tab-bg: #f5f8ff;
   --tab-hover: rgba(0, 158, 144, 0.15);
+  /* Add your new tag variables */
+  --tag-cat-bg: #ffe3e3;     /* Light red/pink */
+  --tag-cat-text: #d11149;   /* Deeper text color */
+
+  --tag-assigned-bg: #e3f8ff; 
+  --tag-assigned-text: #0468d7;
+
+  --tag-date-bg: #fff4e3;    
+  --tag-date-text: #ba6b00;
+
+  --tag-days-bg: #e3ffe3;    
+  --tag-days-text: #148f00;
 }
 
 /* Shared Display Properties */
@@ -141,6 +153,8 @@ button {
   min-width: 160px;
   max-width: 190px;
   transition: width 0.3s ease-in-out;
+  border-right: 1px solid #e3e7f7;
+ 
   
 }
 
@@ -342,6 +356,84 @@ button {
 /* ======================================================
    TASKS, TASK ITEMS & TAGS
 ===================================================== */
+
+
+.tag {
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 20px;
+}
+
+/* These might be used for other statuses: .approved, .review, .waiting, etc. */
+.tag.approved {
+  background-color: var(--tag-color-one);
+  color: var(--tag-color-text-one);
+}
+
+.tag.progress {
+  background-color: var(--tag-color-three);
+  color: var(--tag-color-text-three);
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 20px;
+  width: 80px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tag.review {
+  background-color: var(--tag-color-three);
+  color: var(--tag-color-text-three);
+}
+
+.tag.waiting {
+  background-color: var(--tag-color-four);
+  color: var(--tag-color-text-four);
+}
+
+.tag.progress-wrapper {
+  display: flex;
+  gap: 10px;
+  flex-grow: 1;
+  justify-content: flex-end;
+}
+
+
+/* Overriding background/text for custom classes */
+.tag.progress.tag-category {
+  background-color: var(--tag-cat-bg) !important;
+  color: var(--tag-cat-text) !important;
+}
+
+.tag.progress.tag-assigned {
+  background-color: var(--tag-assigned-bg) !important;
+  color: var(--tag-assigned-text) !important;
+}
+
+.tag.progress.tag-date {
+  background-color: var(--tag-date-bg) !important;
+  color: var(--tag-date-text) !important;
+}
+
+.tag.progress.tag-daysleft {
+  background-color: var(--tag-days-bg) !important;
+  color: var(--tag-days-text) !important;
+}
+
+
+
+
+
+
+
+
+
+
 /* ======================================================
    TASKS, TASK ITEMS & TAGS
 ===================================================== */
@@ -419,48 +511,8 @@ label .label-text:before {
 
 
 
-/* ======================================================
-   TAGS & TAG WRAPPER
-===================================================== */
-.tag {
-  font-size: 10px;
-  padding: 4px 8px;
-  border-radius: 20px;
-}
-.tag.approved {
-  background-color: var(--tag-color-one);
-  color: var(--tag-color-text-one);
-}
-.tag.progress {
-  background-color: var(--tag-color-three);
-  color: var(--tag-color-text-three);
-  font-size: 10px;
-  font-weight: 500;
-  border-radius: 20px;
-  width: 80px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.tag.review {
-  background-color: var(--tag-color-three);
-  color: var(--tag-color-text-three);
-}
-.tag.waiting {
-  background-color: var(--tag-color-four);
-  color: var(--tag-color-text-four);
-}
-.tag.progress-wrapper {
-  display: flex;
-  gap: 10px;
-  flex-grow: 1;
-  justify-content: flex-end;
-  /* Removed redundant left margin values */
-}
+
+
 
 /* ======================================================
    COLUMNS HEADER FOR TASKS

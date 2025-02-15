@@ -250,11 +250,12 @@
         <span class="label-text">${task.title}</span>
       </label>
       <div class="tag progress-wrapper">
-        <div class="tag progress">${task.category || ""}</div>
-        <div class="tag progress">${task.assigned || ""}</div>
-        <div class="tag progress">${task.dueDate || "No due date"}</div>
-        <div class="tag progress">${daysLeft}</div>
+        <div class="tag progress tag-category">${task.category || ""}</div>
+        <div class="tag progress tag-assigned">${task.assigned || ""}</div>
+        <div class="tag progress tag-date">${task.dueDate || "No due date"}</div>
+        <div class="tag progress tag-daysleft">${daysLeft}</div>
       </div>
+
     `;
   
     // Decide where to place it
