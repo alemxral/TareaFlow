@@ -9,6 +9,11 @@
   <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+
+
+
+
+  
 />
 
 </head>
@@ -340,6 +345,45 @@
   </div>
 </div>
 
+<!-- Tasks are classified in #todayTasks, #upcomingTasks, #doneTasks -->
+<!-- ... -->
+
+<!-- MODAL FOR EDITING/DELETING A TASK -->
+
+<div id="taskOptionsModal" class="modal">
+  <div class="modal-content large-modal">
+    <span class="close-btn" onclick="closeTaskOptionsModal()">&times;</span>
+    <h2 class="modal-title">Edit Task</h2>
+
+    <label for="edit-task-title" class="modal-label">Title:</label>
+    <input type="text" id="edit-task-title" class="modal-input" />
+
+    <!-- Category Dropdown -->
+    <label for="edit-task-category" class="modal-label">Category:</label>
+    <select id="edit-task-category" class="modal-input">
+      <!-- Populated dynamically -->
+      <option value="">-- Select Category --</option>
+    </select>
+
+    <!-- Assigned Dropdown -->
+    <label for="edit-task-assigned" class="modal-label">Assigned To:</label>
+    <select id="edit-task-assigned" class="modal-input">
+      <!-- Populated dynamically -->
+      <option value="">-- Select Assignee --</option>
+    </select>
+
+    <!-- Due Date -->
+    <label for="edit-task-date" class="modal-label">Due Date:</label>
+    <input type="date" id="edit-task-date" class="modal-input" />
+
+    <!-- Modal Buttons -->
+    <div class="modal-btn-row">
+      <button class="save-task-btn" onclick="saveTaskEdits()">Save Changes</button>
+      <button class="delete-task-btn" onclick="deleteSelectedTask()">Delete Task</button>
+    </div>
+  </div>
+</div>
+<!-- MODAL FOR EDITING/DELETING A TASK -->
 
   </div>
   <!-- ======================================================

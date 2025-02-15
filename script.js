@@ -128,6 +128,50 @@ class Task {
         tasks = tasks.map(t => t.id === id ? { ...t, done: isDone } : t);
         await StorageManager.saveData("tasks", tasks);
     }
+
+    static async edit(
+        taskId,
+        updatedTitle,
+        updatedCategory,
+        updatedAssigned,
+        updatedDueDate,
+        updatedPriority,
+        updatedDone
+      ) {
+        let tasks = await StorageManager.loadData("tasks");
+        tasks = tasks.map(t =>
+          t.id === taskId
+            ? {
+                ...t,
+                title: updatedTitle,
+                category: updatedCategory,
+                assigned: updatedAssigned,
+                dueDate: updatedDueDate,
+                priority: updatedPriority,
+                done: updatedDone
+              }
+            : t
+        );
+        await StorageManager.saveData("tasks", tasks);
+      }
+    
+ 
+
+
+      static async delete(taskId) {
+        let tasks = await StorageManager.loadData("tasks");
+        tasks = tasks.filter(t => t.id !== taskId);
+        await StorageManager.saveData("tasks", tasks);
+      }
+      
+
+
+
+
+
+
+
+
 }
 
 
@@ -170,7 +214,6 @@ document.addEventListener("DOMContentLoaded", function () {
 /* ====================== CLASSIFY TASKS ====================== */
 /* ====================== CLASSIFY TASKS ====================== */
 function classifyTask(task) {
-    // The wrappers for Today, Upcoming, Done
     const todayWrapper = document.getElementById("todayTasks");
     const upcomingWrapper = document.getElementById("upcomingTasks");
     const doneWrapper = document.getElementById("doneTasks");
@@ -180,11 +223,20 @@ function classifyTask(task) {
     taskElement.classList.add("task");
     taskElement.setAttribute("data-category", task.category.toLowerCase());
   
-    // Compute daysLeft locally (not stored in JSON)
+    // Example: compute days left or display something else
     const daysLeft = calculateDaysLeft(task.dueDate);
   
-    // Build the inner HTML, ignoring task.status
+    // 3-dots icon or a custom character "⋮"
+    // In this example, we use Font Awesome. 
+    // If you prefer just "⋮", replace the <i> with &hellip; or &x22EE;
+    const menuIcon = `
+      <span class="task-menu-icon" onclick="openTaskOptions('${task.id}')">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+      </span>
+    `;
+  
     taskElement.innerHTML = `
+      ${menuIcon}
       <input
         class="task-item"
         name="task"
@@ -203,31 +255,43 @@ function classifyTask(task) {
       </div>
     `;
   
-    // Place the task in the correct wrapper
+    // Decide which wrapper to place it in
     if (task.done) {
       doneWrapper.prepend(taskElement);
-    } else if (!task.dueDate || new Date(task.dueDate).toDateString() === new Date().toDateString()) {
-      todayWrapper.prepend(taskElement);
     } else {
-      upcomingWrapper.prepend(taskElement);
+        // 2) Overdue or no date or same day => today
+        const due = task.dueDate ? new Date(task.dueDate) : null;
+        const now = new Date();
+    
+        const sameDay = due && due.toDateString() === now.toDateString();
+        const overdue = due && due < now; // If due < current date, it's overdue
+        if (!task.dueDate || sameDay || overdue) {
+          todayWrapper.prepend(taskElement);
+        } else {
+          // 3) Everything else => upcoming
+          upcomingWrapper.prepend(taskElement);
+        }
     }
-  
-    // Attach an event listener to toggle `task.done`
+    // Possibly attach event to the checkbox for done toggling:
     const checkbox = taskElement.querySelector(".task-item");
     checkbox.addEventListener("change", async () => {
       const isChecked = checkbox.checked;
-  
-      // 1) Update in storage
-      await Task.toggleDone(task.id, isChecked);
-  
-      // 2) Remove from current wrapper
+      await Task.edit(
+        task.id,
+        task.title,
+        task.category,
+        task.assigned,
+        task.dueDate,
+        task.priority,
+        isChecked
+      );
+      // Remove from current wrapper & re-classify 
       taskElement.remove();
-  
-      // 3) Re-classify so it goes to the correct wrapper
       task.done = isChecked;
       classifyTask(task);
     });
   }
+  
 
   function calculateDaysLeft(dueDate) {
     if (!dueDate) return "No due date";
@@ -244,7 +308,7 @@ async function addTask() {
     // Gather inputs
     const taskTitle = document.getElementById("task-title").value.trim();
     const taskCategory = document.getElementById("task-category").value;
-    const taskAssigned = document.getElementById("task-assigned").value.trim() || "Unassigned";
+    const taskAssigned = document.getElementById("task-assigned").value.trim() || "";
     const taskDueDate = document.getElementById("task-due-date").value;
     const taskPriority = "Normal"; // or from a dropdown if you have one
   
@@ -336,7 +400,7 @@ function filterTasks(categoryName) {
     const targetCat = categoryName.toLowerCase();
   
     document.querySelectorAll(".task").forEach(taskEl => {
-      const taskCat = taskEl.getAttribute("data-category") || "no category";
+      const taskCat = taskEl.getAttribute("data-category") || "";
   
       if (targetCat === "all" || taskCat === targetCat) {
         // Show matching tasks
@@ -349,6 +413,86 @@ function filterTasks(categoryName) {
   }
   
 
+  let currentTaskId = null;
+
+  async function openTaskOptions(taskId) {
+    currentTaskId = taskId;
+  
+    // Load tasks & find this one
+    const tasks = await Task.loadAll();
+    const t = tasks.find(task => task.id === taskId);
+    if (!t) return console.error("Task not found in storage =>", taskId);
+  
+    // Populate the modal fields
+    document.getElementById("edit-task-title").value = t.title;
+    document.getElementById("edit-task-category").value = t.category;
+    document.getElementById("edit-task-assigned").value = t.assigned;
+    document.getElementById("edit-task-date").value = t.dueDate || "";
+    
+    // Show the modal
+    document.getElementById("taskOptionsModal").style.display = "flex";
+  }
+
+  async function saveTaskEdits() {
+    if (!currentTaskId) return;
+  
+    // Grab new field values
+    const updatedTitle = document.getElementById("edit-task-title").value.trim();
+    const updatedCategory = document.getElementById("edit-task-category").value.trim();
+    const updatedAssigned = document.getElementById("edit-task-assigned").value.trim();
+    const updatedDate = document.getElementById("edit-task-date").value;
+  
+    if (!updatedTitle) {
+      alert("Title is required!");
+      return;
+    }
+  
+    // Load tasks to find the existing done/priority
+    const tasks = await Task.loadAll();
+    const existing = tasks.find(t => t.id === currentTaskId);
+    if (!existing) {
+      console.error("Task not found =>", currentTaskId);
+      return;
+    }
+  
+    // Keep the existing done & priority
+    const done = existing.done;
+    const priority = existing.priority;
+  
+    // Update in storage
+    await Task.edit(currentTaskId, updatedTitle, updatedCategory, updatedAssigned, updatedDate, priority, done);
+  
+    // Close the modal
+    closeTaskOptionsModal();
+  
+    // Refresh the UI
+    reloadTasks();
+  }
+  
+
+  async function reloadTasks() {
+    document.getElementById("todayTasks").innerHTML = "";
+    document.getElementById("upcomingTasks").innerHTML = "";
+    document.getElementById("doneTasks").innerHTML = "";
+  
+    const tasks = await Task.loadAll();
+    tasks.forEach(task => classifyTask(task));
+  }
+  
+  async function deleteSelectedTask() {
+    if (!currentTaskId) return;
+  
+    await Task.delete(currentTaskId);
+    closeTaskOptionsModal();
+    reloadTasks();
+  }
+
+ 
+  function closeTaskOptionsModal() {
+    document.getElementById("taskOptionsModal").style.display = "none";
+    currentTaskId = null;
+  }
+  
 
 
 /* ====================== CATEGORY CLASS ====================== */
