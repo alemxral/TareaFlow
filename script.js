@@ -26,10 +26,17 @@
   // Task Modal
   function openTaskModal() {
     safelyExecuteAsync(async () => {
-      await populateCategoryDropdown(); // Load categories for the Add Task modal
+      // 1) Populate categories
+      await populateCategoryDropdown();
+      // 2) Populate users
+      await populateUserDropdownForAddTask();
+  
+      // Then show the task modal
       document.getElementById("taskModal").style.display = "flex";
     });
   }
+  
+
   function closeTaskModal() {
     safelyExecute(() => {
       document.getElementById("taskModal").style.display = "none";
@@ -317,20 +324,28 @@
   async function openTaskOptions(taskId) {
     currentTaskId = taskId;
   
-    // Load tasks & find the selected one
+    // 1) Populate the dropdowns (so the user sees the latest categories/users)
+    await populateEditCategoryDropdown();
+    await populateEditUserDropdown();
+  
+    // 2) Load tasks & find the target
     const tasks = await Task.loadAll();
     const t = tasks.find(task => task.id === taskId);
-    if (!t) return console.error("Task not found in storage =>", taskId);
+    if (!t) {
+      console.error("Task not found in storage =>", taskId);
+      return;
+    }
   
-    // Populate fields
+    // 3) Set existing values
     document.getElementById("edit-task-title").value = t.title;
     document.getElementById("edit-task-category").value = t.category || "";
     document.getElementById("edit-task-assigned").value = t.assigned || "";
     document.getElementById("edit-task-date").value = t.dueDate || "";
   
-    // Show the edit modal
+    // 4) Show the modal
     document.getElementById("taskOptionsModal").style.display = "flex";
   }
+  
   
   function closeTaskOptionsModal() {
     document.getElementById("taskOptionsModal").style.display = "none";
@@ -451,7 +466,73 @@
       categorySelect.appendChild(option);
     });
   }
+
+
+  async function populateEditCategoryDropdown() {
+    const categorySelect = document.getElementById("edit-task-category");
+    if (!categorySelect) return;
   
+    categorySelect.innerHTML = `<option value="">-- Select Category --</option>`;
+    
+    const categories = await Category.loadAll();
+    if (!Array.isArray(categories)) {
+      console.error("Error: categories data is not an array =>", categories);
+      return;
+    }
+  
+    categories.forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat.name;
+      option.textContent = cat.name;
+      categorySelect.appendChild(option);
+    });
+  }
+
+  
+  async function populateEditUserDropdown() {
+    const userSelect = document.getElementById("edit-task-assigned");
+    if (!userSelect) return;
+  
+    userSelect.innerHTML = `<option value="">-- Select Assignee --</option>`;
+  
+    const users = await User.loadAll();
+    if (!Array.isArray(users)) {
+      console.error("Error: users is not an array =>", users);
+      return;
+    }
+  
+    users.forEach(u => {
+      const option = document.createElement("option");
+      option.value = u.name;
+      option.textContent = u.name;
+      userSelect.appendChild(option);
+    });
+  }
+  
+  
+  async function populateUserDropdownForAddTask() {
+    const userSelect = document.getElementById("task-assigned-select");
+    if (!userSelect) return; // Safety check
+  
+    // Clear existing options
+    userSelect.innerHTML = `<option value="">Select Assignee</option>`;
+  
+    // Load all users from storage
+    const users = await User.loadAll();
+    if (!Array.isArray(users)) {
+      console.error("Error: users data is not an array =>", users);
+      return;
+    }
+  
+    // Create <option> for each user
+    users.forEach(u => {
+      const option = document.createElement("option");
+      // Use user name or user.id if you prefer
+      option.value = u.name;
+      option.textContent = u.name;
+      userSelect.appendChild(option);
+    });
+  }
   
   /**************************************************************
    ******************* CATEGORY NAVIGATION **********************
