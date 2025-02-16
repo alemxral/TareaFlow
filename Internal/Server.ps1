@@ -1,20 +1,15 @@
-
 $port = 8080
 $webRoot = "$PSScriptRoot"  # Root directory for serving files
-
 # Ensure the data directory exists for JSON storage
 $dataDir = "$PSScriptRoot\data"
 if (!(Test-Path $dataDir)) {
     New-Item -ItemType Directory -Path $dataDir | Out-Null
 }
-
 # Start the HTTP listener
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$port/")
 $listener.Start()
-
 Write-Host "PowerShell HTTP Server started on http://localhost:$port/"
-
 # Function to get MIME type based on file extension
 function Get-MimeType($file) {
     switch -Regex ($file) {
@@ -35,8 +30,18 @@ while ($true) {
     $response = $context.Response
     $path = $request.Url.LocalPath.TrimStart("/")
 
-    # Check if request is for static files
+    # Handle root path redirection to index.html
+    if ($path -eq "") {
+        $redirectUrl = "http://localhost:$port/index.html"
+        $response.Headers.Set("Location", $redirectUrl)
+        $response.StatusCode = 302  # Temporary redirect
+        $response.OutputStream.Close()
+        continue
+    }
+
     $filePath = Join-Path $webRoot $path
+
+    # Check if request is for static files
     if ($request.HttpMethod -eq "GET" -and (Test-Path $filePath)) {
         try {
             $mimeType = Get-MimeType $filePath
@@ -44,8 +49,11 @@ while ($true) {
             $content = [System.IO.File]::ReadAllBytes($filePath)
             $response.OutputStream.Write($content, 0, $content.Length)
         } catch {
-            $response.StatusCode = 500
-            [System.Text.Encoding]::UTF8.GetBytes("Internal Server Error") | ForEach-Object { $response.OutputStream.Write($_, 0, $_.Length) }
+            $redirectUrl = "http://localhost:$port/index.html"
+            $response.Headers.Set("Location", $redirectUrl)
+            $response.StatusCode = 302  # Temporary redirect
+            $response.OutputStream.Close()
+            continue
         }
     }
     # API: Save JSON Data
@@ -53,13 +61,10 @@ while ($true) {
         $reader = New-Object System.IO.StreamReader($request.InputStream)
         $jsonData = $reader.ReadToEnd()
         $reader.Close()
-
         $data = ConvertFrom-Json $jsonData
         $filePath = "$dataDir\$($data.filename).json"
-
         $jsonData | Set-Content -Path $filePath -Encoding utf8
         Write-Host "Saved data to $filePath"
-
         $response.StatusCode = 200
         [System.Text.Encoding]::UTF8.GetBytes("{'status': 'success'}") | ForEach-Object { $response.OutputStream.Write($_, 0, $_.Length) }
     }
@@ -67,7 +72,6 @@ while ($true) {
     elseif ($request.HttpMethod -eq "GET" -and $path -match "api/load/(.*)") {
         $fileName = $matches[1]
         $filePath = "$dataDir\$fileName.json"
-
         if (Test-Path $filePath) {
             $jsonContent = Get-Content -Path $filePath -Raw
             $response.ContentType = "application/json"
@@ -78,9 +82,11 @@ while ($true) {
         }
     }
     else {
-        $response.StatusCode = 404
-        [System.Text.Encoding]::UTF8.GetBytes("Not Found") | ForEach-Object { $response.OutputStream.Write($_, 0, $_.Length) }
+        $redirectUrl = "http://localhost:$port/index.html"
+        $response.Headers.Set("Location", $redirectUrl)
+        $response.StatusCode = 302  # Temporary redirect
+        $response.OutputStream.Close()
+        continue
     }
-
     $response.OutputStream.Close()
 }
