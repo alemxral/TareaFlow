@@ -1,4 +1,3 @@
-# PowerShell HTTP Server - Serves Static Files & Handles JSON Storage
 
 $port = 8080
 $webRoot = "$PSScriptRoot"  # Root directory for serving files
