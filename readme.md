@@ -42,7 +42,7 @@ This project is a **Task Manager** combined with a **Multi-Year Holiday Calendar
 
 
 
-### 3️⃣ Run the Project throught TareaFlow.exe/TareaFlow-Init.vbs or alternatively:
+### 2️⃣ Run the Project throught TareaFlow.exe/TareaFlow-Init.vbs or alternatively:
 
 ```sh
 .\server.ps1
