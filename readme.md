@@ -4,7 +4,8 @@
 
 This project is a **Task Manager** combined with a **Multi-Year Holiday Calendar (2024 - 2027)**. It allows users to manage tasks, assign them to users, and book holidays for specific users. The holidays are visually represented on a calendar with assigned colors per user.
 
-![alt text](https://github.com/alemxral/tareaFlow/tree/main/Internal/image-1.png))
+![TareaFlow Screenshot](https://raw.githubusercontent.com/alemxral/tareaFlow/main/Internal/image-1.png)
+
 
 ## Features
 
@@ -39,18 +40,12 @@ This project is a **Task Manager** combined with a **Multi-Year Holiday Calendar
  cd task-manager
 ```
 
-### 2️⃣ Install Dependencies
 
-This project uses a simple **Node.js server** for API calls.
 
-```sh
- npm install
-```
-
-### 3️⃣ Run the Project
+### 3️⃣ Run the Project throught TareaFlow.exe/TareaFlow-Init.vbs or alternatively:
 
 ```sh
- npm start
+.\server.ps1
 ```
 
 Then, open `http://localhost:8080` in your browser.
