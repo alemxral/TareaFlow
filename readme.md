@@ -62,7 +62,6 @@ Then, open `http://localhost:8080` in your browser.
 │   │   ├── categories.json
 │   │   ├── holidays.json
 │   │   ├── notes.json
-│   │   ├── TareaFlow.EXE
 │   │   ├── tasks.json
 │   │   ├── users.json
 │   ├── holidays.css
@@ -75,7 +74,6 @@ Then, open `http://localhost:8080` in your browser.
 │   ├── Server.ps1
 │   ├── style.css
 │   ├── TareaFlow.vbs
-├── package-lock.json
 ├── readme.md
 ├── TareaFlow-Init.vbs
 ├── TareaFlow.exe
