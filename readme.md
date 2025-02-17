@@ -4,7 +4,7 @@
 
 This project is a **Task Manager** combined with a **Multi-Year Holiday Calendar (2024 - 2027)**. It allows users to manage tasks, assign them to users, and book holidays for specific users. The holidays are visually represented on a calendar with assigned colors per user.
 
-![TareaFlow Screenshot](https://raw.githubusercontent.com/alemxral/tareaFlow/main/Internal/image-1.png)
+![TareaFlow Screenshot](https://raw.githubusercontent.com/alemxral/TareaFlow/main/Internal/image-1.png)
 
 
 ## Features
