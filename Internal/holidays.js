@@ -13,13 +13,10 @@ class User {
       try {
         const res = await fetch("http://localhost:8080/api/load/users");
         if (!res.ok) {
-          // e.g. 404 => file not found
           console.warn(`Users file not found or load error: ${res.status}`);
           return [];
         }
         const textData = await res.text();
-        console.log("Raw users response text:", textData);
-  
         let jsonData;
         try {
           jsonData = JSON.parse(textData);
@@ -27,14 +24,9 @@ class User {
           console.error("Error parsing users JSON:", parseErr);
           return [];
         }
-        console.log("Parsed users JSON:", jsonData);
-  
-        // If directly an array
         if (Array.isArray(jsonData)) {
           userData = jsonData;
-        }
-        // If { filename: "users", data: [...] }
-        else if (jsonData && Array.isArray(jsonData.data)) {
+        } else if (jsonData && Array.isArray(jsonData.data)) {
           userData = jsonData.data;
         } else {
           console.warn("Unexpected shape of users JSON, using empty array.");
@@ -43,9 +35,40 @@ class User {
         console.error("Error loading users:", error);
         return [];
       }
-  
-      // convert userData => array of User objects
       return userData.map(u => new User(u.id, u.name, u.color));
+    }
+
+    static async saveAll(users) {
+      const payload = { filename: "users", data: users };
+      try {
+        await fetch("http://localhost:8080/api/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.error("Error saving users:", err);
+      }
+    }
+
+    static async add(name, color) {
+      const newUser = new User(null, name, color);
+      const users = await User.loadAll();
+      users.push(newUser);
+      await User.saveAll(users);
+      return newUser;
+    }
+
+    static async edit(userId, newName, newColor) {
+      let users = await User.loadAll();
+      users = users.map(u => u.id === userId ? { ...u, name: newName, color: newColor } : u);
+      await User.saveAll(users);
+    }
+
+    static async delete(userId) {
+      let users = await User.loadAll();
+      users = users.filter(u => u.id !== userId);
+      await User.saveAll(users);
     }
   
     static async findById(userId) {
@@ -53,6 +76,165 @@ class User {
       return allUsers.find(u => u.id === userId);
     }
   }
+
+
+/***************************************************************
+ * 2) USER MODAL FUNCTIONALITIES
+ ***************************************************************/
+let editingUserId = null;
+
+async function openUserModal() {
+    await displayUsers();
+    document.getElementById("user-name").value = "";
+    document.getElementById("user-color").value = "#ff0000";
+    document.getElementById("edit-user-id").value = "";
+    editingUserId = null;
+  
+    document.getElementById("userModal").style.display = "flex";
+}
+
+function closeUserModal() {
+    document.getElementById("userModal").style.display = "none";
+    editingUserId = null;
+}
+
+async function displayUsers() {
+    const userListContainer = document.getElementById("userListContainer");
+    userListContainer.innerHTML = "";
+  
+    const users = await User.loadAll();
+    document.getElementById("userCount").textContent = users.length;
+  
+    if (users.length === 0) {
+        userListContainer.innerHTML = "<p>No users found.</p>";
+        return;
+    }
+  
+    users.forEach(u => {
+        const userCard = document.createElement("div");
+        userCard.classList.add("user-card");
+        userCard.innerHTML = `
+            <div class="user-header">
+                <div class="user-color-bullet" style="background-color: ${u.color};"></div>
+                <div class="user-name">${u.name}</div>
+            </div>
+            <button class="edit-user-btn" onclick="startEditUser('${u.id}')">Edit</button>
+        `;
+        userListContainer.appendChild(userCard);
+    });
+}
+
+async function startEditUser(userId) {
+    allUsers = await User.loadAll(); // ✅ Ensure the latest users are loaded
+    const user = allUsers.find(u => u.id === userId);
+
+    if (!user) {
+        console.error("⚠️ User not found =>", userId);
+        alert("User not found. Try refreshing.");
+        return;
+    }
+
+    document.getElementById("user-name").value = user.name;
+    document.getElementById("user-color").value = user.color;
+    document.getElementById("edit-user-id").value = user.id;
+}
+
+
+async function saveUser() {
+  const userName = document.getElementById("user-name").value.trim();
+  const userColor = document.getElementById("user-color").value.trim();
+  const existingId = document.getElementById("edit-user-id").value;
+
+  if (!userName) {
+      alert("User name is required!");
+      return;
+  }
+
+  if (existingId) {
+      // Editing an existing user
+      await User.edit(existingId, userName, userColor);
+  } else {
+      // Creating a new user
+      await User.add(userName, userColor);
+  }
+
+  // ✅ Reload users everywhere to ensure changes are reflected
+  allUsers = await User.loadAll(); // Reload global users list
+  await populateUserSelect(); // Reload the dropdown in holiday modal
+  await displayUsers(); // Reload user list in user modal
+  await updateUserCount(); // Update user count in UI
+
+  // Reset form
+  document.getElementById("user-name").value = "";
+  document.getElementById("user-color").value = "#ff0000";
+  document.getElementById("edit-user-id").value = "";
+  editingUserId = null;
+}
+
+
+async function deleteUser() {
+    const existingId = document.getElementById("edit-user-id").value;
+    if (!existingId) {
+        alert("No user selected to delete!");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to delete this user?")) {
+        return;
+    }
+
+    await User.delete(existingId);
+    await displayUsers();
+  
+    document.getElementById("user-name").value = "";
+    document.getElementById("user-color").value = "#ff0000";
+    document.getElementById("edit-user-id").value = "";
+    editingUserId = null;
+}
+
+
+/***************************************************************
+ * 3) UPDATE HOLIDAY USER DROPDOWN AFTER CHANGES
+ ***************************************************************/
+async function populateUserSelect() {
+  holidayUserSelect.innerHTML = ""; // Clear old options
+
+  // ✅ Always reload users before updating dropdown
+  allUsers = await User.loadAll(); 
+
+  if (allUsers.length === 0) {
+      console.warn("No users loaded; user dropdown is empty.");
+      return;
+  }
+
+  allUsers.forEach(u => {
+      const opt = document.createElement("option");
+      opt.value = u.id;
+      opt.textContent = u.name;
+      holidayUserSelect.appendChild(opt);
+  });
+}
+
+
+
+/***************************************************************
+ * 4) UPDATE USER COUNT
+ ***************************************************************/
+async function updateUserCount() {
+  const users = await User.loadAll();
+  document.getElementById("userCount").textContent = users.length;
+}
+
+
+/***************************************************************
+ * 5) INITIALIZATION AFTER DOM LOAD
+ ***************************************************************/
+document.addEventListener("DOMContentLoaded", async function () {
+  await displayUsers();
+  await updateUserCount();
+  await populateUserSelect();
+});
+
   
   /***************************************************************
    * 2) HOLIDAY CLASS (robust load)
@@ -355,7 +537,9 @@ class User {
 /************************
  * Holiday Modal
  ************************/
-function openHolidayModal(holidayId = null) {
+async function openHolidayModal(holidayId = null) {
+  await populateUserSelect(); // ✅ Load the latest users before opening the modal
+
   if (!holidayId) {
     // No ID provided → Create new holiday
     if (selectedDates.size === 0) {
@@ -395,6 +579,7 @@ function openHolidayModal(holidayId = null) {
   // Open the modal
   holidayModal.classList.add("active");
 }
+
 
   
   function closeHolidayModal(){
@@ -563,3 +748,351 @@ function openHolidayModal(holidayId = null) {
     selectedDates.clear();
   }
   
+
+  /***************************************************************
+ * ✅ 1) Work From Home Class (Handles Storage & CRUD)
+ ***************************************************************/
+class WorkingFromHome {
+    constructor(id, wfhName, userId, dates = []) {
+        this.id = id || `wfh-${Date.now()}`;
+        this.wfhName = wfhName;
+        this.userId = userId;
+        this.dates = new Set(dates);
+    }
+
+    // Load all WFH records
+    static async loadAll() {
+        try {
+            const res = await fetch("http://localhost:8080/api/load/wfh");
+            if (!res.ok) {
+                console.warn(`⚠️ WFH file not found or load error: ${res.status}`);
+                return [];
+            }
+            const jsonData = await res.json();
+            return jsonData.data.map(wfh => new WorkingFromHome(wfh.id, wfh.wfhName, wfh.userId, wfh.dates));
+        } catch (error) {
+            console.error("❌ Error loading WFH:", error);
+            return [];
+        }
+    }
+
+    // Save all WFH records
+    static async saveAll(wfhArray) {
+        const payload = {
+            filename: "wfh",
+            data: wfhArray.map(wfh => ({
+                id: wfh.id,
+                wfhName: wfh.wfhName,
+                userId: wfh.userId,
+                dates: Array.from(wfh.dates)
+            }))
+        };
+
+        try {
+            const res = await fetch("http://localhost:8080/api/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            console.log("✅ Save WFH response:", await res.text());
+        } catch (err) {
+            console.error("❌ Error saving WFH:", err);
+        }
+    }
+
+    // Add new WFH entry
+    static async add(wfhName, userId, dateSet) {
+        const newWFH = new WorkingFromHome(null, wfhName, userId, dateSet);
+        let allWFH = await WorkingFromHome.loadAll();
+        allWFH.push(newWFH);
+        await WorkingFromHome.saveAll(allWFH);
+        return newWFH;
+    }
+
+    // Remove a WFH entry
+    static async remove(wfhId) {
+        let allWFH = await WorkingFromHome.loadAll();
+        allWFH = allWFH.filter(wfh => wfh.id !== wfhId);
+        await WorkingFromHome.saveAll(allWFH);
+    }
+}
+
+/***************************************************************
+ * ✅ 2) WFH Modal - Open, Close & Manage Entries
+ ***************************************************************/
+const wfhModal = document.getElementById("wfhModal");
+const openWFHBtn = document.getElementById("openWFHModalBtn");
+const closeWFHBtn = document.getElementById("cancelWFHBtn");
+const saveWFHBtn = document.getElementById("saveWFHBtn");
+const deleteWFHBtn = document.getElementById("deleteWFHBtn");
+const wfhUserSelect = document.getElementById("wfhUserSelect");
+const wfhNameInput = document.getElementById("wfhName");
+const wfhSelectedDates = document.getElementById("wfhSelectedDates");
+
+let allWFH = [];
+let selectedWFHDates = new Set();
+let editingWFHId = null;
+
+// ✅ Open Modal with Dynamic Data
+openWFHBtn.addEventListener("click", () => openWFHModal());
+
+// ✅ Save WFH Entry
+saveWFHBtn.addEventListener("click", saveWFH);
+async function saveWFH() {
+    const userId = wfhUserSelect.value;
+    const reason = wfhNameInput.value.trim();
+
+    if (!userId) {
+        alert("⚠️ Please select a user!");
+        return;
+    }
+    if (selectedDates.size === 0) {  
+        alert("⚠️ Please select at least one date!");
+        return;
+    }
+
+    if (editingWFHId) {
+        console.log("✏ Updating WFH entry...");
+        const existing = allWFH.find(w => w.id === editingWFHId);
+        if (!existing) {
+            console.error("❌ Error: WFH entry not found!");
+            alert("⚠️ WFH entry not found. Try again.");
+            return;
+        }
+
+        // ✅ Update existing entry
+        existing.userId = userId;
+        existing.wfhName = reason;
+        existing.dates = new Set([...selectedDates]); // ✅ Store dates properly
+
+        try {
+            await WorkingFromHome.saveAll(allWFH);
+        } catch (e) {
+            console.error("❌ Error saving updated WFH:", e);
+        }
+    } else {
+        console.log("➕ Adding new WFH entry...");
+        try {
+            const newWFH = await WorkingFromHome.add(reason, userId, [...selectedDates]);
+            allWFH.push({
+                id: newWFH.id,
+                wfhName: newWFH.wfhName,
+                userId: newWFH.userId,
+                dates: new Set(newWFH.dates),
+            });
+        } catch (e) {
+            console.error("❌ Error adding WFH entry:", e);
+        }
+    }
+
+    closeWFHModal();
+    rebuildCalendarView();
+}
+
+
+// ✅ Open WFH Modal - Now Populates Selected Dates Correctly
+async function openWFHModal(wfhId = null) {
+  console.log("🔹 Opening WFH Modal...");
+  await loadUsersIntoWFHDropdown();
+
+  if (wfhId) {
+      console.log("✏ Editing WFH:", wfhId);
+      editingWFHId = wfhId;
+      const wfhEntry = allWFH.find(w => w.id === wfhId);
+
+      if (!wfhEntry) {
+          console.warn("⚠️ WFH entry not found. Switching to create mode.");
+          openWFHModal();
+          return;
+      }
+
+      // ✅ Load existing WFH data into modal
+      wfhUserSelect.value = wfhEntry.userId;
+      wfhNameInput.value = wfhEntry.wfhName;
+      selectedDates = new Set(wfhEntry.dates); // ✅ Ensures selected dates are retained
+
+      deleteWFHBtn.style.display = "block"; 
+  } else {
+      console.log("➕ Creating new WFH entry");
+      editingWFHId = null;
+      wfhUserSelect.selectedIndex = 0;
+      wfhNameInput.value = "";
+      selectedDates.clear();
+      deleteWFHBtn.style.display = "none";
+  }
+
+  updateWFHSelectedDatesDisplay(); // ✅ Ensure selected dates are displayed in modal
+
+  wfhModal.style.display = "flex";
+  wfhModal.classList.add("active");
+}
+
+// ✅ Update Selected Dates Display in WFH Modal
+function updateWFHSelectedDatesDisplay() {
+  wfhSelectedDates.innerHTML = [...selectedDates].join(", ") || "No dates selected";
+}
+
+
+
+// ✅ Close Modal
+closeWFHBtn.addEventListener("click", closeWFHModal);
+function closeWFHModal() {
+    console.log("❌ Closing WFH Modal...");
+    wfhModal.style.display = "none";
+    wfhModal.classList.remove("active");
+    selectedWFHDates.clear();
+}
+
+/***************************************************************
+ * ✅ 3) WFH Actions - Save, Delete & Load Users
+ ***************************************************************/
+
+// ✅ Load Users into Dropdown
+async function loadUsersIntoWFHDropdown() {
+    wfhUserSelect.innerHTML = `<option value="">-- Select User --</option>`;
+    const users = await User.loadAll();
+
+    if (!users.length) {
+        console.warn("⚠️ No users found!");
+        return;
+    }
+
+    users.forEach(user => {
+        const option = document.createElement("option");
+        option.value = user.id;
+        option.textContent = user.name;
+        wfhUserSelect.appendChild(option);
+    });
+
+    console.log("✅ WFH User dropdown loaded successfully.");
+}
+
+// ✅ Save WFH Entry
+saveWFHBtn.addEventListener("click", saveWFH);
+async function saveWFH() {
+    const userId = wfhUserSelect.value;
+    const reason = wfhNameInput.value.trim();
+
+    if (!userId) {
+        alert("⚠️ Please select a user!");
+        return;
+    }
+    if (selectedWFHDates.size === 0) {
+        alert("⚠️ Please select at least one date!");
+        return;
+    }
+
+    if (editingWFHId) {
+        console.log("✏ Updating WFH entry...");
+        const existing = allWFH.find(w => w.id === editingWFHId);
+        if (!existing) return console.error("❌ Error: WFH entry not found!");
+
+        existing.userId = userId;
+        existing.wfhName = reason;
+        existing.dates = [...selectedWFHDates];
+        await WorkingFromHome.saveAll(allWFH);
+    } else {
+        console.log("➕ Adding new WFH entry...");
+        const newWFH = await WorkingFromHome.add(reason, userId, [...selectedWFHDates]);
+        allWFH.push(newWFH);
+    }
+
+    closeWFHModal();
+    rebuildCalendarView();
+}
+
+// ✅ Delete WFH Entry
+deleteWFHBtn.addEventListener("click", deleteWFH);
+async function deleteWFH() {
+    if (!editingWFHId) return;
+    if (!confirm("🛑 Are you sure you want to delete this WFH entry?")) return;
+
+    allWFH = allWFH.filter(w => w.id !== editingWFHId);
+    await WorkingFromHome.saveAll(allWFH);
+    closeWFHModal();
+    rebuildCalendarView();
+}
+
+// ✅ Update Selected Dates Display
+function updateWFHSelectedDatesDisplay() {
+    wfhSelectedDates.innerHTML = [...selectedWFHDates].join(", ") || "No dates selected";
+}
+
+/***************************************************************
+ * ✅ 4) Highlight WFH Days in Calendar
+ ***************************************************************/
+
+function highlightDayIfHoliday(dateStr, container) {
+    allHolidays.forEach(h => {
+        if (h.dates.has(dateStr)) {
+            const userObj = allUsers.find(u => u.id === h.userId);
+            const color = userObj ? userObj.color : "#ccc";
+            const circ = document.createElement("div");
+            circ.classList.add("user-circle");
+            circ.style.backgroundColor = color;
+            container.appendChild(circ);
+        }
+    });
+
+    allWFH.forEach(wfh => {
+        if (wfh.dates.has(dateStr)) {
+            const userObj = allUsers.find(u => u.id === wfh.userId);
+            const color = userObj ? userObj.color : "#888";
+            const square = document.createElement("div");
+            square.classList.add("wfh-square");
+            square.style.backgroundColor = color;
+            container.appendChild(square);
+        }
+    });
+}
+
+
+
+// ✅ Save new or update WFH Entry
+async function saveWFH() {
+  const userId = wfhUserSelect.value;
+  const nameVal = wfhNameInput.value.trim();
+
+  if (!userId || !nameVal) {
+      alert("⚠️ User & reason for WFH are required!");
+      return;
+  }
+
+  if (editingEventId && eventType === "wfh") {
+      // ✅ Update existing WFH
+      const existing = allWFH.find(w => w.id === editingEventId);
+      if (!existing) {
+          alert("⚠️ WFH entry not found, cannot update!");
+          return;
+      }
+      existing.wfhName = nameVal;
+      existing.userId = userId;
+      existing.dates = new Set([...selectedDates]);
+
+      try {
+          await WorkingFromHome.saveAll(allWFH);
+      } catch (e) {
+          console.error("❌ Edit WFH error:", e);
+      }
+  } else {
+      // ✅ Create new WFH entry
+      if (selectedDates.size === 0) {
+          alert("⚠️ No dates selected!");
+          return;
+      }
+      try {
+          const newWFH = await WorkingFromHome.add(nameVal, userId, [...selectedDates]);
+          allWFH.push({
+              id: newWFH.id,
+              wfhName: newWFH.wfhName,
+              userId: newWFH.userId,
+              dates: new Set(newWFH.dates)
+          });
+      } catch (e) {
+          console.error("❌ Add WFH error:", e);
+      }
+  }
+
+  closeEventModal("wfh");
+  rebuildCalendarView();
+}

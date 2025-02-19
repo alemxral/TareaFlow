@@ -1,0 +1,5 @@
+19/02/2025 20:10:50 - PowerShell processes terminated.
+19/02/2025 20:10:50 - Script Path: C:\Users\pc\tareaflow\Internal
+19/02/2025 20:10:50 - PowerShell Script Path: C:\Users\pc\tareaflow\Internal\Server.ps1
+19/02/2025 20:10:50 - Executing: powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "C:\Users\pc\tareaflow\Internal\Server.ps1"
+19/02/2025 20:10:51 - Opening: chrome.exe http://localhost:8080/index.html

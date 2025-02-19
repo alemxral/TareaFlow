@@ -1131,3 +1131,170 @@ async function deleteCategory() {
     document.getElementById("userCount").textContent = users.length;
   }
   
+
+
+  class WorkingFromHome {
+    constructor(id, wfhName, userId, dates = []) {
+        this.id = id || `wfh-${Date.now()}`;
+        this.wfhName = wfhName;
+        this.userId = userId;
+        this.dates = Array.isArray(dates) ? new Set(dates) : new Set();
+    }
+
+    // Load all WFH records
+    static async loadAll() {
+        let wfhData = [];
+        try {
+            const res = await fetch("http://localhost:8080/api/load/wfh");
+            if (!res.ok) {
+                console.warn(`WFH file not found or load error: ${res.status}`);
+                return [];
+            }
+            const textData = await res.text();
+            let jsonData;
+            try {
+                jsonData = JSON.parse(textData);
+            } catch (parseErr) {
+                console.error("Error parsing WFH JSON:", parseErr);
+                return [];
+            }
+
+            if (Array.isArray(jsonData)) {
+                wfhData = jsonData;
+            } else if (jsonData && Array.isArray(jsonData.data)) {
+                wfhData = jsonData.data;
+            } else {
+                console.warn("Unexpected shape of WFH JSON, using empty array.");
+                return [];
+            }
+        } catch (error) {
+            console.error("Error loading WFH:", error);
+            return [];
+        }
+
+        return wfhData.map(wfh => new WorkingFromHome(wfh.id, wfh.wfhName, wfh.userId, wfh.dates));
+    }
+
+    // Save all WFH records
+    static async saveAll(wfhArray) {
+        const cleanedData = wfhArray.map(wfh => ({
+            id: wfh.id,
+            wfhName: wfh.wfhName,
+            userId: wfh.userId,
+            dates: Array.from(wfh.dates) 
+        }));
+
+        const payload = { filename: "wfh", data: cleanedData };
+        try {
+            const res = await fetch("http://localhost:8080/api/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            console.log("Save WFH response:", await res.text());
+        } catch (err) {
+            console.error("Error saving WFH:", err);
+        }
+    }
+
+    static async add(wfhName, userId, dateSet) {
+        const newWFH = new WorkingFromHome(null, wfhName, userId, dateSet);
+        let allWFH = await WorkingFromHome.loadAll();
+        allWFH.push(newWFH);
+        await WorkingFromHome.saveAll(allWFH);
+        return newWFH;
+    }
+
+    static async remove(wfhId) {
+        let allWFH = await WorkingFromHome.loadAll();
+        allWFH = allWFH.filter(wfh => wfh.id !== wfhId);
+        await WorkingFromHome.saveAll(allWFH);
+    }
+}
+
+/**********************************************************
+ * OPEN & CLOSE WFH MODAL
+ **********************************************************/
+let editingWFHId = null;
+
+async function openWFHModal(wfhId = null) {
+    await loadUsersIntoWFHDropdown();
+
+    if (!wfhId) {
+        if (selectedDates.size === 0) {
+            alert("Select at least one date first!");
+            return;
+        }
+
+        editingWFHId = null;
+        document.getElementById("wfhModalTitle").textContent = "Add Work from Home";
+        document.getElementById("saveWFHBtn").textContent = "Save";
+        document.getElementById("deleteWFHBtn").style.display = "none";
+        document.getElementById("wfhUserSelect").selectedIndex = 0;
+        document.getElementById("wfhName").value = "";
+
+    } else {
+        editingWFHId = wfhId;
+        document.getElementById("wfhModalTitle").textContent = "Edit Work from Home";
+        document.getElementById("saveWFHBtn").textContent = "Update";
+        document.getElementById("deleteWFHBtn").style.display = "inline-block";
+
+        const wfh = allWFH.find(w => w.id === wfhId);
+        if (!wfh) {
+            console.warn("WFH entry not found:", wfhId);
+            openWFHModal(); 
+            return;
+        }
+
+        document.getElementById("wfhUserSelect").value = wfh.userId;
+        document.getElementById("wfhName").value = wfh.wfhName;
+    }
+
+    document.getElementById("wfhModal").classList.add("active");
+}
+
+/**********************************************************
+ * SAVE OR DELETE WFH
+ **********************************************************/
+async function saveWFH() {
+    const userId = document.getElementById("wfhUserSelect").value;
+    const nameVal = document.getElementById("wfhName").value.trim();
+
+    if (!userId) {
+        alert("Select a user!");
+        return;
+    }
+
+    if (editingWFHId) {
+        const existing = allWFH.find(w => w.id === editingWFHId);
+        if (!existing) {
+            alert("WFH entry not found!");
+            return;
+        }
+        existing.wfhName = nameVal;
+        existing.userId = userId;
+        await WorkingFromHome.saveAll(allWFH);
+    } else {
+        if (selectedDates.size === 0) {
+            alert("No dates selected!");
+            return;
+        }
+        await WorkingFromHome.add(nameVal, userId, [...selectedDates]);
+    }
+
+    closeWFHModal();
+    rebuildCalendarView();
+}
+
+async function removeWFH() {
+    if (!editingWFHId) return;
+    if (!confirm("Are you sure to delete this entry?")) return;
+
+    await WorkingFromHome.remove(editingWFHId);
+    closeWFHModal();
+    rebuildCalendarView();
+}
+
+function closeWFHModal() {
+    document.getElementById("wfhModal").classList.remove("active");
+}

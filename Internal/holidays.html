@@ -19,6 +19,38 @@
   <!-- ======================================================
        MAIN CONTAINER START
   ====================================================== -->
+
+ 
+
+  <div id="userModal" class="modal">
+    <div class="modal-content user-modal-content">
+      <span class="close-btn" onclick="closeUserModal()">&times;</span>
+      <h2 class="modal-title">User Management</h2>
+  
+      <!-- Display Existing Users in a grid/card layout -->
+      <div id="userListContainer" class="user-grid"></div>
+  
+      <hr />
+  
+      <!-- Form to Add or Edit a User -->
+      <div class="user-form">
+        <label for="user-name">Name:</label>
+        <input type="text" id="user-name" class="modal-input" placeholder="Enter user name" />
+  
+        <label for="user-color">Color:</label>
+        <input type="color" id="user-color" class="modal-input" value="#ff0000" />
+  
+        <!-- Hidden field if editing an existing user -->
+        <input type="hidden" id="edit-user-id" value="" />
+  
+        <div class="modal-btn-row">
+          <button class="save-user-btn" onclick="saveUser()">Save User</button>
+          <button class="delete-user-btn" onclick="deleteUser()">Delete User</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="task-manager">
 
     <!-- ======================================================
@@ -63,6 +95,26 @@
          PAGE CONTENT
     ====================================================== -->
     <div class="page-content">
+
+      <div class="top-part" onclick="openUserModal()">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="24" height="24"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             stroke-linecap="round"
+             stroke-linejoin="round"
+             class="feather feather-users">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        <!-- Display how many users there are -->
+        <div class="count" id="userCount">0</div>
+      </div>
+
       <!-- Multi-year holidays container -->
       <div class="multi-year-calendar">
         <!-- Nav: Month/Year + Buttons -->
@@ -93,8 +145,8 @@
             <div class="holiday-list" id="holidayList"></div>
             <!-- Add new holiday from selected dates -->
             <button class="add-holiday-btn" id="openHolidayModalBtn">+ Add Holiday</button>
+            <button class="add-wfh-btn" id="openWFHModalBtn">+ Work from Home</button>
           </div>
-        </div>
       </div>
     </div>
 
@@ -120,6 +172,30 @@
         </div>
       </div>
     </div>
+
+<!-- Working from Home Modal -->
+<div id="wfhModal" class="modal">
+  <div class="modal-content">
+    <h2 id="wfhModalTitle">Work from Home</h2>
+    
+    <label for="wfhUserSelect">Select User:</label>
+    <select id="wfhUserSelect"></select>
+
+    <label for="wfhName">Reason (optional):</label>
+    <input type="text" id="wfhName" placeholder="Reason for WFH">
+
+    <label>Selected Dates:</label>
+    <div id="wfhSelectedDates"></div>
+
+    <button id="saveWFHBtn">Save</button>
+    <button id="cancelWFHBtn">Cancel</button>
+    <button id="deleteWFHBtn" style="display: none;">Delete</button>
+  </div>
+</div>
+
+
+
+
 
 
 

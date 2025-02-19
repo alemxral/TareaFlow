@@ -162,6 +162,24 @@
   .add-holiday-btn:hover {
 	background: #49beb7;
   }
+
+  .add-wfh-btn {
+	width: 100%;
+	background: #009e90;
+	color: #fff;
+	padding: 8px;
+	margin-top: 5px;
+	border-radius: 4px;
+	border: none;
+	cursor: pointer;
+	transition: background 0.3s ease;
+  }
+  .add-wfh-btn:hover {
+	background: #49beb7;
+  }
+
+
+
   
   /**************************************************************
    * HOLIDAY MODAL
@@ -264,6 +282,191 @@
 	font-style: italic;
 	opacity: 0.8;
   }
+
+
+
+    
+  /**************************************************************
+ * CORNER USERS
+ **************************************************************/
+
+
+
+  .top-part {
+    position: absolute;
+    top: 10px; /* Distance from the top */
+    right: 50px; /* Distance from the right */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px; /* Reduced padding */
+    background: #f8f9fa; /* Light background */
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.top-part:hover {
+    background: #e0e0e0;
+    transform: scale(1.05);
+}
+
+/* Icon styling */
+.top-part svg {
+    width: 20px;
+    height: 20px;
+    stroke: #333; /* Icon color */
+}
+
+/* User count badge */
+.top-part .count {
+    margin-left: 6px;
+    background: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 50%;
+    min-width: 20px;
+    text-align: center;
+}
+
+
+/* Holiday Indicator (Circle) */
+.user-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 3px;
+}
+
+/* Work from Home Indicator (Square) */
+.wfh-square {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px; /* Slightly rounded corners */
+    display: inline-block;
+    margin-left: 3px;
+}
+
+
+
+
+/* ====== WFH MODAL STYLING ====== */
+#wfhModal {
+	display: none; /* Hidden by default */
+	position: fixed;
+	z-index: 1000;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+  }
+  
+  /* Modal Content */
+  #wfhModal .modal-content {
+	background: white;
+	padding: 20px;
+	width: 400px;
+	max-width: 90%;
+	border-radius: 10px;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+	text-align: center;
+  }
+  
+  /* Modal Header */
+  #wfhModal h2 {
+	margin-bottom: 15px;
+	font-size: 22px;
+	color: #333;
+  }
+  
+  /* Labels */
+  #wfhModal label {
+	display: block;
+	font-weight: bold;
+	margin-top: 10px;
+	text-align: left;
+  }
+  
+  /* Select & Input */
+  #wfhModal select,
+  #wfhModal input {
+	width: 100%;
+	padding: 10px;
+	margin-top: 5px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+  }
+  
+  /* Selected Dates */
+  #wfhSelectedDates {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 5px;
+	margin-top: 10px;
+	padding: 10px;
+	background: #f8f8f8;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	min-height: 40px;
+	text-align: left;
+  }
+  
+  /* Buttons */
+  #wfhModal button {
+	width: 100%;
+	padding: 10px;
+	margin-top: 10px;
+	border: none;
+	cursor: pointer;
+	border-radius: 5px;
+	font-size: 16px;
+	font-weight: bold;
+	transition: background 0.3s ease-in-out;
+  }
+  
+  /* Save Button */
+  #saveWFHBtn {
+	background: #28a745;
+	color: white;
+  }
+  
+  #saveWFHBtn:hover {
+	background: #218838;
+  }
+  
+  /* Cancel Button */
+  #cancelWFHBtn {
+	background: #dc3545;
+	color: white;
+  }
+  
+  #cancelWFHBtn:hover {
+	background: #c82333;
+  }
+  
+  /* Delete Button (Initially Hidden) */
+  #deleteWFHBtn {
+	background: #ffc107;
+	color: black;
+  }
+  
+  #deleteWFHBtn:hover {
+	background: #e0a800;
+  }
+  
+  #wfhModal {
+	display: none; /* Ensure it's hidden on page load */
+  }
+  
+
   
   /**************************************************************
  * PRELOADER STYLING
