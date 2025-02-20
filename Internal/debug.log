@@ -8,3 +8,23 @@
 19/02/2025 23:28:52 - PowerShell Script Path: C:\Users\pc\tareaflow\Internal\Server.ps1
 19/02/2025 23:28:52 - Executing: powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "C:\Users\pc\tareaflow\Internal\Server.ps1"
 19/02/2025 23:28:53 - Opening: chrome.exe http://localhost:8080/index.html
+20/02/2025 2:16:32 - PowerShell processes terminated.
+20/02/2025 2:16:32 - Script Path: C:\Users\pc\tareaflow\Internal
+20/02/2025 2:16:32 - PowerShell Script Path: C:\Users\pc\tareaflow\Internal\Server.ps1
+20/02/2025 2:16:32 - Executing: powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "C:\Users\pc\tareaflow\Internal\Server.ps1"
+20/02/2025 2:16:33 - Opening: chrome.exe http://localhost:8080/index.html
+20/02/2025 2:30:06 - PowerShell processes terminated.
+20/02/2025 2:30:06 - Script Path: C:\Users\pc\tareaflow\Internal
+20/02/2025 2:30:06 - PowerShell Script Path: C:\Users\pc\tareaflow\Internal\Server.ps1
+20/02/2025 2:30:06 - Executing: powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "C:\Users\pc\tareaflow\Internal\Server.ps1"
+20/02/2025 2:30:07 - Opening: chrome.exe http://localhost:8080/index.html
+20/02/2025 2:36:41 - PowerShell processes terminated.
+20/02/2025 2:36:41 - Script Path: C:\Users\pc\tareaflow\Internal
+20/02/2025 2:36:41 - PowerShell Script Path: C:\Users\pc\tareaflow\Internal\Server.ps1
+20/02/2025 2:36:41 - Executing: powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "C:\Users\pc\tareaflow\Internal\Server.ps1"
+20/02/2025 2:36:43 - Opening: chrome.exe http://localhost:8080/index.html
+20/02/2025 2:37:49 - PowerShell processes terminated.
+20/02/2025 2:37:49 - Script Path: C:\Users\pc\tareaflow\Internal
+20/02/2025 2:37:49 - PowerShell Script Path: C:\Users\pc\tareaflow\Internal\Server.ps1
+20/02/2025 2:37:49 - Executing: powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "C:\Users\pc\tareaflow\Internal\Server.ps1"
+20/02/2025 2:37:50 - Opening: chrome.exe http://localhost:8080/index.html
