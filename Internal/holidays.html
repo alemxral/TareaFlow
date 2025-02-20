@@ -143,9 +143,15 @@
           <div class="calendar-right-panel">
             <h3>Holidays</h3>
             <div class="holiday-list" id="holidayList"></div>
+            
+            <h3>WFH Events</h3>
+            <div class="wfh-list" id="wfhList"></div>
+
+
+
             <!-- Add new holiday from selected dates -->
             <button class="add-holiday-btn" id="openHolidayModalBtn">+ Add Holiday</button>
-            <button class="add-wfh-btn" id="openWFHModalBtn">+ Work from Home</button>
+           
           </div>
       </div>
     </div>
@@ -154,44 +160,30 @@
          MODALS
     ====================================================== -->
     <!-- Add/Edit Holiday Modal -->
-    <div class="holiday-modal" id="holidayModal">
-      <div class="holiday-modal-content">
-        <h2 id="holidayModalTitle">Add Holiday for Selected Dates</h2>
-
-        <label for="holidayUserSelect">User:</label>
-        <!-- a dropdown listing the loaded users -->
-        <select id="holidayUserSelect" class="user-select"></select>
-
-        <label for="holidayName">Holiday Name:</label>
-        <input type="text" id="holidayName" placeholder="e.g. Summer Break" />
-
-        <div class="modal-btn-row">
-          <button class="modal-btn" id="cancelHolidayBtn">Cancel</button>
-          <button class="modal-btn" id="saveHolidayBtn">Save</button>
-          <button class="modal-btn" id="deleteHolidayBtn" style="display:none;">Delete</button>
-        </div>
-      </div>
+<!-- Add/Edit Holiday Modal -->
+<div class="holiday-modal" id="holidayModal">
+  <div class="holiday-modal-content">
+    <h2 id="holidayModalTitle">Add Holiday for Selected Dates</h2>
+    <label for="holidayUserSelect">User:</label>
+    <select id="holidayUserSelect" class="user-select"></select>
+    <label for="holidayName">Holiday Name:</label>
+    <input type="text" id="holidayName" placeholder="e.g. Summer Break" />
+    <!-- NEW: Choose event type -->
+    <label for="eventType">Event Type:</label>
+    <select id="eventType" class="event-select">
+      <option value="holiday">Holiday</option>
+      <option value="wfh">WFH</option>
+    </select>
+    <div class="modal-btn-row">
+      <button class="modal-btn" id="cancelHolidayBtn">Cancel</button>
+      <button class="modal-btn" id="saveHolidayBtn">Save</button>
+      <button class="modal-btn" id="deleteHolidayBtn" style="display:none;">Delete</button>
     </div>
-
-<!-- Working from Home Modal -->
-<div id="wfhModal" class="modal">
-  <div class="modal-content">
-    <h2 id="wfhModalTitle">Work from Home</h2>
-    
-    <label for="wfhUserSelect">Select User:</label>
-    <select id="wfhUserSelect"></select>
-
-    <label for="wfhName">Reason (optional):</label>
-    <input type="text" id="wfhName" placeholder="Reason for WFH">
-
-    <label>Selected Dates:</label>
-    <div id="wfhSelectedDates"></div>
-
-    <button id="saveWFHBtn">Save</button>
-    <button id="cancelWFHBtn">Cancel</button>
-    <button id="deleteWFHBtn" style="display: none;">Delete</button>
   </div>
 </div>
+
+
+
 
 
 

@@ -3,3 +3,8 @@
 19/02/2025 20:10:50 - PowerShell Script Path: C:\Users\pc\tareaflow\Internal\Server.ps1
 19/02/2025 20:10:50 - Executing: powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "C:\Users\pc\tareaflow\Internal\Server.ps1"
 19/02/2025 20:10:51 - Opening: chrome.exe http://localhost:8080/index.html
+19/02/2025 23:28:52 - PowerShell processes terminated.
+19/02/2025 23:28:52 - Script Path: C:\Users\pc\tareaflow\Internal
+19/02/2025 23:28:52 - PowerShell Script Path: C:\Users\pc\tareaflow\Internal\Server.ps1
+19/02/2025 23:28:52 - Executing: powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "C:\Users\pc\tareaflow\Internal\Server.ps1"
+19/02/2025 23:28:53 - Opening: chrome.exe http://localhost:8080/index.html

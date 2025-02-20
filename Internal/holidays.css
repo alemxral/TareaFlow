@@ -145,6 +145,39 @@
 	font-size: 0.9rem;
 	cursor: pointer;
   }
+
+/* WFH List Styling */
+.wfh-list {
+	max-height: 420px;
+	overflow-y: auto;
+	padding: 5px;
+	border: 1px solid #eee;
+	border-radius: 4px;
+	margin-bottom: 10px;
+  }
+  
+  .wfh-item {
+	border-radius: 6px;
+	margin: 8px 0;
+	padding: 10px;
+	background-color: var(--wfh-bg);
+	color: #fff;
+	font-size: 0.9rem;
+	cursor: pointer;
+  }
+  
+  /* Optional: You can style the WFH symbol on the calendar as well */
+  .wfh-symbol {
+	width: 10px;
+	height: 10px;
+	display: inline-block;
+	margin-right: 2px;
+	/* You can add a border or use a background image if desired */
+  }
+
+
+
+  .wfh-item,
   .holiday-item:hover {
 	opacity: 0.9;
   }
