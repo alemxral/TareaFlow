@@ -142,18 +142,22 @@
 
           <!-- RIGHT: Holiday info panel -->
           <div class="calendar-right-panel">
+            <!-- Filter selection -->
+            <select id="filterSelect" class="filter-select">
+              <option value="all">Show All</option>
+              <option value="old">Show Old</option>
+              <option value="thisMonth">This Month</option>
+            </select>
+            
             <h3>Holidays</h3>
             <div class="holiday-list" id="holidayList"></div>
             
             <h3>Work From Home</h3>
             <div class="wfh-list" id="wfhList"></div>
-
-
-
-            <!-- Add new holiday from selected dates -->
+            
             <button class="add-holiday-btn" id="openHolidayModalBtn">+ Add Event</button>
-           
           </div>
+          
       </div>
     </div>
 

@@ -52,7 +52,9 @@ class User {
   }
 
   static async add(name, color) {
-    const newUser = new User(null, name, color);
+    // Generate a unique id based on the current timestamp
+    const newId = `user-${Date.now()}`;
+    const newUser = new User(newId, name, color);
     const users = await User.loadAll();
     users.push(newUser);
     await User.saveAll(users);
@@ -752,13 +754,100 @@ async function removeHoliday(){
 /************************
  * Right Panel List Updates
  ************************/
+// Update the holiday list to apply the filter.
+
+function filterEvents(events, filterValue) {
+  // Define start and end of the current month.
+  const monthStart = new Date(currentYear, currentMonth, 1);
+  const monthEnd = new Date(currentYear, currentMonth + 1, 0); // last day of current month
+
+  // Filter events based on the filter criteria.
+  const filtered = events.filter(e => {
+    const datesArray = Array.from(e.dates);
+    if (datesArray.length === 0) return false; // skip events without dates
+    // Sort dates (ISO strings sort naturally)
+    datesArray.sort();
+    const firstDate = new Date(datesArray[0]);
+    const lastDate = new Date(datesArray[datesArray.length - 1]);
+
+    if (filterValue === "all") {
+      return true;
+    } else if (filterValue === "old") {
+      // Old: events that ended before this month started.
+      return lastDate < monthStart;
+    } else if (filterValue === "thisMonth") {
+      // This Month: event overlaps the current month.
+      return (
+        (firstDate >= monthStart && firstDate <= monthEnd) ||
+        (lastDate >= monthStart && lastDate <= monthEnd) ||
+        (firstDate < monthStart && lastDate > monthEnd)
+      );
+    }
+    return true;
+  });
+
+  // Sort events by their earliest date.
+  return filtered.sort((a, b) => {
+    const aDates = Array.from(a.dates).sort();
+    const bDates = Array.from(b.dates).sort();
+    return new Date(aDates[0]) - new Date(bDates[0]);
+  });
+}
+
+document.getElementById("filterSelect").addEventListener("change", function() {
+  updateHolidayList();
+  updateWFHList();
+});
+
+
+function updateWFHList() {
+  const filterVal = document.getElementById("filterSelect").value;
+  // Filter WFH events using the helper function
+  const filteredWFH = filterEvents(allWFH, filterVal);
+  wfhListEl.innerHTML = "";
+  if (filteredWFH.length === 0) {
+    wfhListEl.innerHTML = "<p>No WFH events found.</p>";
+    return;
+  }
+  // Sort events by their earliest date (the helper already sorts them)
+  filteredWFH.forEach(w => {
+    const item = document.createElement("div");
+    item.classList.add("wfh-item");
+    const userObj = allUsers.find(u => u.id === w.userId);
+    const color = userObj ? userObj.color : "#444";
+    const wfhDates = [...w.dates].sort();
+    const dateRange = wfhDates.length > 0
+      ? `${wfhDates[0]} → ${wfhDates[wfhDates.length - 1]}`
+      : "No dates selected";
+    // Set a custom CSS property for background color
+    item.style.setProperty("--wfh-bg", color);
+    item.innerHTML = `
+      <div class="wfh-item-title">${w.wfhName}</div>
+      <div class="wfh-item-user">${userObj ? userObj.name : "Unknown"} (${w.dates.size} days)</div>
+      <div class="wfh-item-date">${dateRange}</div>
+      <div class="wfh-item-daypart">Day: ${w.dayPart}</div>
+    `;
+    // Reuse the same modal for editing
+    item.addEventListener("click", () => openHolidayModal(w.id));
+    wfhListEl.appendChild(item);
+  });
+}
+
+
+
+
+
+
+
 function updateHolidayList() {
+  const filterVal = document.getElementById("filterSelect").value;
+  const filteredHolidays = filterEvents(allHolidays, filterVal);
   holidayListEl.innerHTML = "";
-  if (allHolidays.length === 0) {
+  if (filteredHolidays.length === 0) {
     holidayListEl.innerHTML = "<p>No holiday events found.</p>";
     return;
   }
-  allHolidays.forEach(h => {
+  filteredHolidays.forEach(h => {
     const item = document.createElement("div");
     item.classList.add("holiday-item");
     const userObj = allUsers.find(u => u.id === h.userId);
@@ -778,6 +867,43 @@ function updateHolidayList() {
     holidayListEl.appendChild(item);
   });
 }
+
+// Update the WFH list to apply the filter.
+function updateWFHList() {
+  const filterVal = document.getElementById("filterSelect").value;
+  const filteredWFH = filterEvents(allWFH, filterVal);
+  wfhListEl.innerHTML = "";
+  if (filteredWFH.length === 0) {
+    wfhListEl.innerHTML = "<p>No WFH events found.</p>";
+    return;
+  }
+  filteredWFH.forEach(w => {
+    const item = document.createElement("div");
+    item.classList.add("wfh-item");
+    const userObj = allUsers.find(u => u.id === w.userId);
+    const color = userObj ? userObj.color : "#444";
+    const wfhDates = [...w.dates].sort();
+    const dateRange = wfhDates.length > 0
+      ? `${wfhDates[0]} → ${wfhDates[wfhDates.length - 1]}`
+      : "No dates selected";
+    item.style.setProperty("--wfh-bg", color);
+    item.innerHTML = `
+      <div class="wfh-item-title">${w.wfhName}</div>
+      <div class="wfh-item-user">${userObj ? userObj.name : "Unknown"} (${w.dates.size} days)</div>
+      <div class="wfh-item-date">${dateRange}</div>
+      <div class="wfh-item-daypart">Day: ${w.dayPart}</div>
+    `;
+    item.addEventListener("click", () => openHolidayModal(w.id));
+    wfhListEl.appendChild(item);
+  });
+}
+
+// Add an event listener to the filter select to update lists when the filter changes.
+document.getElementById("filterSelect").addEventListener("change", function() {
+  updateHolidayList();
+  updateWFHList();
+});
+
 
 function updateWFHList() {
   wfhListEl.innerHTML = "";
