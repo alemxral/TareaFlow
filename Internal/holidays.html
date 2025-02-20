@@ -8,6 +8,7 @@
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css?family=DM+Sans:400,500,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <!-- Main CSS -->
   <link rel="stylesheet" href="style.css" />
@@ -144,13 +145,13 @@
             <h3>Holidays</h3>
             <div class="holiday-list" id="holidayList"></div>
             
-            <h3>WFH Events</h3>
+            <h3>Work From Home</h3>
             <div class="wfh-list" id="wfhList"></div>
 
 
 
             <!-- Add new holiday from selected dates -->
-            <button class="add-holiday-btn" id="openHolidayModalBtn">+ Add Holiday</button>
+            <button class="add-holiday-btn" id="openHolidayModalBtn">+ Add Event</button>
            
           </div>
       </div>
@@ -161,19 +162,32 @@
     ====================================================== -->
     <!-- Add/Edit Holiday Modal -->
 <!-- Add/Edit Holiday Modal -->
+<!-- Add/Edit Event Modal -->
 <div class="holiday-modal" id="holidayModal">
   <div class="holiday-modal-content">
-    <h2 id="holidayModalTitle">Add Holiday for Selected Dates</h2>
+    <h2 id="holidayModalTitle">Add Event for Selected Dates</h2>
+    
     <label for="holidayUserSelect">User:</label>
     <select id="holidayUserSelect" class="user-select"></select>
-    <label for="holidayName">Holiday Name:</label>
+    
+    <label for="holidayName">Details:</label>
     <input type="text" id="holidayName" placeholder="e.g. Summer Break" />
-    <!-- NEW: Choose event type -->
+    
+    <!-- Choose event type -->
     <label for="eventType">Event Type:</label>
     <select id="eventType" class="event-select">
       <option value="holiday">Holiday</option>
       <option value="wfh">WFH</option>
     </select>
+    
+    <!-- NEW: Select Day Part -->
+    <label for="dayPart">Day Part:</label>
+    <select id="dayPart" class="day-part-select">
+      <option value="full">Full Day</option>
+      <option value="morning">Morning</option>
+      <option value="afternoon">Afternoon</option>
+    </select>
+    
     <div class="modal-btn-row">
       <button class="modal-btn" id="cancelHolidayBtn">Cancel</button>
       <button class="modal-btn" id="saveHolidayBtn">Save</button>
@@ -181,6 +195,7 @@
     </div>
   </div>
 </div>
+
 
 
 

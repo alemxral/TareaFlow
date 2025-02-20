@@ -208,14 +208,15 @@ document.addEventListener("DOMContentLoaded", async function () {
 });
 
 /***************************************************************
- * 6) HOLIDAY CLASS (robust load)
+ * 6) HOLIDAY CLASS (robust load) WITH DAY PART
  ***************************************************************/
 class Holiday {
-  constructor(id, holidayName, userId, dates = []) {
+  constructor(id, holidayName, userId, dates = [], dayPart = "full") {
     this.id = id || `holiday-${Date.now()}`;
     this.holidayName = holidayName;
     this.userId = userId;
     this.dates = Array.isArray(dates) ? new Set(dates) : new Set();
+    this.dayPart = dayPart;
   }
 
   static async loadAll() {
@@ -252,7 +253,8 @@ class Holiday {
       h.id,
       h.holidayName,
       h.userId,
-      Array.isArray(h.dates) ? h.dates : []
+      Array.isArray(h.dates) ? h.dates : [],
+      h.dayPart || "full"
     ));
   }
 
@@ -261,7 +263,8 @@ class Holiday {
       id: h.id,
       holidayName: h.holidayName,
       userId: h.userId,
-      dates: Array.from(h.dates)
+      dates: Array.from(h.dates),
+      dayPart: h.dayPart
     }));
     const payload = { filename: "holidays", data: cleanedData };
     try {
@@ -276,19 +279,19 @@ class Holiday {
     }
   }
 
-  static async add(holidayName, userId, dateSet) {
-    const newHol = new Holiday(null, holidayName, userId, dateSet);
+  static async add(holidayName, userId, dateSet, dayPart) {
+    const newHol = new Holiday(null, holidayName, userId, dateSet, dayPart);
     let allHols = await Holiday.loadAll();
     allHols.push(newHol);
     await Holiday.saveAll(allHols);
     return newHol;
   }
 
-  static async edit(holidayId, newName, newUserId, newDates) {
+  static async edit(holidayId, newName, newUserId, newDates, dayPart) {
     let allHols = await Holiday.loadAll();
     allHols = allHols.map(h => {
       if (h.id === holidayId) {
-        return new Holiday(h.id, newName, newUserId, newDates);
+        return new Holiday(h.id, newName, newUserId, newDates, dayPart);
       }
       return h;
     });
@@ -303,15 +306,16 @@ class Holiday {
 }
 
 /***************************************************************
- * 7) WFH CLASS (robust load)
+ * 7) WFH CLASS (robust load) WITH DAY PART
  * This mirrors the Holiday class but works with "wfh" data.
  ***************************************************************/
 class WFH {
-  constructor(id, wfhName, userId, dates = []) {
+  constructor(id, wfhName, userId, dates = [], dayPart = "full") {
     this.id = id || `wfh-${Date.now()}`;
     this.wfhName = wfhName;
     this.userId = userId;
     this.dates = Array.isArray(dates) ? new Set(dates) : new Set();
+    this.dayPart = dayPart;
   }
 
   static async loadAll() {
@@ -346,7 +350,8 @@ class WFH {
       w.id,
       w.wfhName,
       w.userId,
-      Array.isArray(w.dates) ? w.dates : []
+      Array.isArray(w.dates) ? w.dates : [],
+      w.dayPart || "full"
     ));
   }
 
@@ -355,7 +360,8 @@ class WFH {
       id: w.id,
       wfhName: w.wfhName,
       userId: w.userId,
-      dates: Array.from(w.dates)
+      dates: Array.from(w.dates),
+      dayPart: w.dayPart
     }));
     const payload = { filename: "wfh", data: cleanedData };
     try {
@@ -370,19 +376,19 @@ class WFH {
     }
   }
 
-  static async add(wfhName, userId, dateSet) {
-    const newWFH = new WFH(null, wfhName, userId, dateSet);
+  static async add(wfhName, userId, dateSet, dayPart) {
+    const newWFH = new WFH(null, wfhName, userId, dateSet, dayPart);
     let allWFHEvents = await WFH.loadAll();
     allWFHEvents.push(newWFH);
     await WFH.saveAll(allWFHEvents);
     return newWFH;
   }
 
-  static async edit(wfhId, newName, newUserId, newDates) {
+  static async edit(wfhId, newName, newUserId, newDates, dayPart) {
     let allWFHEvents = await WFH.loadAll();
     allWFHEvents = allWFHEvents.map(w => {
       if (w.id === wfhId) {
-        return new WFH(w.id, newName, newUserId, newDates);
+        return new WFH(w.id, newName, newUserId, newDates, dayPart);
       }
       return w;
     });
@@ -497,53 +503,38 @@ function populateUserSelect(){
  * Build the Calendar
  ************************/
 function buildCalendar(year, month){
-  // Remove all cells except the header (first 7 children)
   while (calendarGrid.children.length > 7) {
     calendarGrid.removeChild(calendarGrid.lastChild);
   }
-  
   const monthNames = ["January","February","March","April","May","June",
                       "July","August","September","October","November","December"];
   monthYearLabel.textContent = `${monthNames[month]} ${year}`;
-  
-  // Calculate first day and total days in the month
   const firstDay = new Date(year, month, 1);
-  const startDay = firstDay.getDay(); // 0=Sun...6=Sat
+  const startDay = firstDay.getDay();
   const totalDays = new Date(year, month+1, 0).getDate();
-  
-  // Create blank cells for days before month start
   for (let i = 0; i < startDay; i++){
     const emptyCell = document.createElement("div");
     emptyCell.classList.add("day-cell");
     calendarGrid.appendChild(emptyCell);
   }
-  
-  // Create cells for each day of the month
   for (let d = 1; d <= totalDays; d++){
     const cell = document.createElement("div");
     cell.classList.add("day-cell");
-    
     const checkToday = new Date();
     if (year === checkToday.getFullYear() && month === checkToday.getMonth() && d === checkToday.getDate()){
       cell.classList.add("today");
     }
-    
-    // Day number element
     const dayNumEl = document.createElement("div");
     dayNumEl.classList.add("day-number");
     dayNumEl.textContent = d;
     cell.appendChild(dayNumEl);
-    
-    // Container for event markers
     const circleCont = document.createElement("div");
     circleCont.classList.add("day-holiday-users");
     cell.appendChild(circleCont);
-    
-    // ISO formatted date for this cell
     const iso = toISODate(year, month, d);
     cell.dataset.date = iso;
     
-    // Reapply visual selection based on the active event type and saved selections
+    // Reapply visual selection based on event type:
     const eventTypeElement = document.getElementById("eventType");
     if (eventTypeElement) {
       const eventType = eventTypeElement.value;
@@ -558,42 +549,37 @@ function buildCalendar(year, month){
       }
     }
     
-    // Add any visual markers for events
     highlightDayIfHoliday(iso, circleCont);
     highlightDayIfWFH(iso, circleCont);
-    
-    // Attach the click event to toggle date selection
     cell.addEventListener("click", () => toggleDateSelection(iso, cell));
-    
     calendarGrid.appendChild(cell);
   }
 }
 
-
-// Highlight holidays
+// Highlight holidays using a FontAwesome plane icon, for example.
 function highlightDayIfHoliday(dateStr, container){
   allHolidays.forEach(h => {
     if (h.dates.has(dateStr)) {
       const userObj = allUsers.find(u => u.id === h.userId);
       const color = userObj ? userObj.color : "#ccc";
-      const circ = document.createElement("div");
-      circ.classList.add("user-circle");
-      circ.style.backgroundColor = color;
-      container.appendChild(circ);
+      const icon = document.createElement("i");
+      icon.classList.add("fa", "fa-plane", "holiday-icon");
+      icon.style.color = color;
+      container.appendChild(icon);
     }
   });
 }
 
-// Highlight WFH events using a different symbol (make sure your CSS defines .wfh-symbol)
+// Highlight WFH events using a FontAwesome home icon.
 function highlightDayIfWFH(dateStr, container) {
   allWFH.forEach(w => {
     if (w.dates.has(dateStr)) {
       const userObj = allUsers.find(u => u.id === w.userId);
       const color = userObj ? userObj.color : "#ccc";
-      const sym = document.createElement("div");
-      sym.classList.add("wfh-symbol");
-      sym.style.backgroundColor = color;
-      container.appendChild(sym);
+      const icon = document.createElement("i");
+      icon.classList.add("fa", "fa-home", "wfh-icon");
+      icon.style.color = color;
+      container.appendChild(icon);
     }
   });
 }
@@ -645,8 +631,11 @@ async function openHolidayModal(holidayId = null) {
   await populateUserSelect();
   // Set default event type to Holiday
   document.getElementById("eventType").value = "holiday";
-  // Removed the alert about selecting a date so that the modal opens regardless
+  // Set default Day Part to Full Day
+  document.getElementById("dayPart").value = "full";
+  
   if (!holidayId) {
+    // Open modal in creation mode (do not force a date selection)
     editingHolidayId = null;
     holidayModalTitle.textContent = "Add Event for Selected Dates";
     saveHolidayBtn.textContent = "Save";
@@ -658,6 +647,7 @@ async function openHolidayModal(holidayId = null) {
     holidayModalTitle.textContent = "Edit or Remove Event";
     saveHolidayBtn.textContent = "Update";
     deleteHolidayBtn.style.display = "inline-block";
+    // Try finding in holidays; if not, look in WFH events.
     const hol = allHolidays.find(h => h.id === holidayId) || allWFH.find(w => w.id === holidayId);
     if (!hol) {
       console.warn("Event not found for editing:", holidayId);
@@ -665,15 +655,19 @@ async function openHolidayModal(holidayId = null) {
       return;
     }
     holidayUserSelect.value = hol.userId;
+    // For display, use holidayName if available; otherwise use wfhName.
     holidayNameInput.value = hol.holidayName || hol.wfhName;
+    document.getElementById("eventType").value = hol.holidayName ? "holiday" : "wfh";
+    document.getElementById("dayPart").value = hol.dayPart || "full";
   }
   holidayModal.classList.add("active");
 }
 
 function closeHolidayModal(){
   holidayModal.classList.remove("active");
-  selectedDates.clear();
-  selectedWFHDates.clear();
+  // Optionally, clear selections here if you want:
+  // selectedDates.clear();
+  // selectedWFHDates.clear();
   rebuildCalendarView();
 }
 
@@ -681,22 +675,24 @@ async function saveHoliday(){
   const userId = holidayUserSelect.value;
   const nameVal = holidayNameInput.value.trim();
   const eventType = document.getElementById("eventType").value;
+  const dayPart = document.getElementById("dayPart").value;
   console.debug("Saving event. Type:", eventType, 
                 "Selected holiday dates:", [...selectedDates], 
-                "Selected WFH dates:", [...selectedWFHDates]);
+                "Selected WFH dates:", [...selectedWFHDates],
+                "Day Part:", dayPart);
   if (!userId || !nameVal){
     alert("User & event name are required!");
     return;
   }
   if (eventType === "wfh") {
-    // Allow saving even if no dates selected (empty date set will be saved)
     try {
-      const newWFH = await WFH.add(nameVal, userId, [...selectedWFHDates]);
+      const newWFH = await WFH.add(nameVal, userId, [...selectedWFHDates], dayPart);
       allWFH.push({
         id: newWFH.id,
         wfhName: newWFH.wfhName,
         userId: newWFH.userId,
-        dates: new Set(newWFH.dates)
+        dates: new Set(newWFH.dates),
+        dayPart: newWFH.dayPart
       });
       console.debug("WFH event saved:", newWFH);
     } catch(e) {
@@ -712,20 +708,21 @@ async function saveHoliday(){
         }
         existing.holidayName = nameVal;
         existing.userId = userId;
-        await Holiday.edit(editingHolidayId, nameVal, userId, [...existing.dates]);
+        await Holiday.edit(editingHolidayId, nameVal, userId, [...existing.dates], dayPart);
         console.debug("Holiday event updated:", editingHolidayId);
       } else {
-        const newHol = await Holiday.add(nameVal, userId, [...selectedDates]);
+        const newHol = await Holiday.add(nameVal, userId, [...selectedDates], dayPart);
         allHolidays.push({
           id: newHol.id,
           holidayName: newHol.holidayName,
           userId: newHol.userId,
-          dates: new Set(newHol.dates)
+          dates: new Set(newHol.dates),
+          dayPart: newHol.dayPart
         });
         console.debug("Holiday event saved:", newHol);
       }
     } catch(e) {
-      console.error("Add/Edit holiday error:", e);
+      console.error("Add/Edit event error:", e);
     }
   }
   closeHolidayModal();
@@ -775,6 +772,7 @@ function updateHolidayList() {
       <div class="holiday-item-title">${h.holidayName}</div>
       <div class="holiday-item-user">${userObj ? userObj.name : "Unknown"} (${h.dates.size} days)</div>
       <div class="holiday-item-date">${dateRange}</div>
+      <div class="holiday-item-daypart">Day: ${h.dayPart}</div>
     `;
     item.addEventListener("click", () => openHolidayModal(h.id));
     holidayListEl.appendChild(item);
@@ -801,13 +799,13 @@ function updateWFHList() {
       <div class="wfh-item-title">${w.wfhName}</div>
       <div class="wfh-item-user">${userObj ? userObj.name : "Unknown"} (${w.dates.size} days)</div>
       <div class="wfh-item-date">${dateRange}</div>
+      <div class="wfh-item-daypart">Day: ${w.dayPart}</div>
     `;
     // For editing, we reuse the same modal
     item.addEventListener("click", () => openHolidayModal(w.id));
     wfhListEl.appendChild(item);
   });
 }
-
 
 /************************
  * Navigation Functions
@@ -859,9 +857,8 @@ function rebuildCalendarView(){
   buildCalendar(currentYear, currentMonth);
   updateHolidayList();
   updateWFHList();
+  // Do not clear selections here so they persist in the calendar view.
 }
-
-
 
 /************************
  * Transfer Selection on Event Type Change

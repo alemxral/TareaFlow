@@ -166,21 +166,72 @@
 	cursor: pointer;
   }
   
-  /* Optional: You can style the WFH symbol on the calendar as well */
-  .wfh-symbol {
-	width: 10px;
-	height: 10px;
-	display: inline-block;
+  .wfh-icon {
+	font-size: 20px;  /* Adjust size as needed */
 	margin-right: 2px;
-	/* You can add a border or use a background image if desired */
+	vertical-align: middle;
+  }
+  
+
+  .wfh-item {
+	opacity: 0.9;
   }
 
-
-
-  .wfh-item,
+  
   .holiday-item:hover {
 	opacity: 0.9;
   }
+
+
+  .event-select{
+	padding: 5px 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background-color: #fff;
+	font-size: 1rem;
+	color: #333;
+	outline: none;
+	margin-top: 5px;
+	display: block;
+  }
+  
+  
+  .event-select:focus {
+	border-color: #007bff;
+	box-shadow: 0 0 5px rgba(0,123,255,0.5);
+  }
+
+
+  
+  .day-part-select {
+	padding: 5px 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background-color: #fff;
+	font-size: 1rem;
+	color: #333;
+	outline: none;
+	margin-top: 5px;
+	display: block;
+  }
+  
+  
+  
+
+  .holiday-item-daypart,
+  .wfh-item-daypart {
+	font-size: 0.8rem;
+	margin-top: 5px;
+	font-style: italic;
+  }
+  
+
+  .holiday-icon {
+	font-size: 20px;  /* Adjust size as needed */
+	margin-right: 2px;
+	vertical-align: middle;
+  }
+  
   
   .add-holiday-btn {
 	width: 100%;
